@@ -1,1 +1,1 @@
-# Boilerplate React App
+# Stock Watcher

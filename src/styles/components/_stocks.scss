@@ -1,0 +1,10 @@
+.stocks__watching {
+  display: flex;
+  flex-wrap: wrap;
+  .stocks__stock {
+    border: 1px solid black;
+    height: 6rem;
+    margin: 0.6rem;
+    width: 30rem;
+  }
+}
