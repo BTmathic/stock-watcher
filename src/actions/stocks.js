@@ -30,14 +30,34 @@ export const removeStock = (id = '') => ({
   id
 });
 
-export const startRemoveStock = (props) => {
-  console.log(props); // need props.id or props.data.id
+export const startRemoveStock = (id) => {
   return (dispatch, getState) => {
     const uid = getState().auth.uid;
     return database.ref(`users/${uid}/stocks/${id}`).remove().then(() => {
-      dispatch(removeExpense(id));
+      dispatch(removeStock(id));
     });
   };
 };
 
 // Set
+export const setStocks = (stocks) => ({
+  type: 'SET_STOCKS',
+  stocks
+});
+
+export const startSetStocks = () => {
+  return (dispatch, getState) => {
+    const uid = getState().auth.uid;
+    return database.ref(`users/${uid}/stocks`).once('value')
+      .then((snapshot) => {
+        const stocks = [];
+        snapshot.forEach((childSnapshot) => {
+          stocks.push({
+            id: childSnapshot.key,
+            ...childSnapshot.val()
+          });
+        });
+        dispatch(setStocks(stocks));
+      });
+  };
+};

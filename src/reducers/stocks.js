@@ -7,8 +7,10 @@ export default (state = stocksReducerDefaultState, action) => {
         ...state,
         action.stock
       ];
-    // case 'REMOVE_STOCK
-    // case 'SET_STOCK
+    case 'REMOVE_STOCK':
+      return state.filter(({ id }) => id !== action.id);
+    case 'SET_STOCKS':
+      return action.stocks;
     default:
       return state;
   }

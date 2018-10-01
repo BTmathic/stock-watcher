@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { startAddStock } from '../actions/stocks';
+import { startAddStock, startRemoveStock } from '../actions/stocks';
 
 class DashboardPage extends React.Component {
   state = {
@@ -11,6 +11,23 @@ class DashboardPage extends React.Component {
   handleInput = (e) => {
     const newStock = e.target.value;
     this.setState(() => ({ newStock }));
+  }
+
+  deleteStock = (ticker) => {
+    this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id);
+    const oldStocks = this.state.stocks;
+    const stocks = oldStocks.filter((stock) => stock.name !== ticker);
+    this.setState(() => ({ stocks }));
+  }
+
+  loadStockData = (newStock) => {
+    // add something to make sure stock is not already loaded
+    this.props.startAddStock(newStock);
+    const stocks = this.state.stocks;
+    stocks.push(newStock);
+    this.setState(() => ({
+      stocks: stocks
+    }));
   }
 
   onSubmit = (e) => {
@@ -24,7 +41,7 @@ class DashboardPage extends React.Component {
       .then((json) => {
         const metaData = json['Meta Data'];
         if (!!metaData) {
-          const name = metaData['2. Symbol'];
+          const name = metaData['2. Symbol'].toUpperCase();
           const lastUpdated = metaData['3. Last Refreshed'];
           const values = json['Weekly Time Series'];
           const closingValues = Object.keys(values).map((date) => ({
@@ -32,16 +49,12 @@ class DashboardPage extends React.Component {
             price: values[date]['4. close']
           }));
           const newStock = { name, lastUpdated, closingValues };
-          this.props.startAddStock(newStock);
-          const stocks = this.state.stocks;
-          stocks.push(newStock);
-          this.setState(() => ({
-            stocks: stocks
-          }));
+          this.loadStockData(newStock);
         } else {
-          // let the user know no stock with their submitted ticker was found
+          const noStock = { name: `No stock with ticker ${this.state.newStock.toUpperCase()} found`, lastUpdated: '', closingValues: []}
+          this.loadStockData(noStock);
         }
-      });
+    });
   }
 
   render() {
@@ -59,14 +72,20 @@ class DashboardPage extends React.Component {
                 this.props.stocks.map((stock) => {
                   return (
                     <div className='stocks__stock' key={stock.name}>
-                      <div className='stocks__stock-ticker'>{stock.name.toUpperCase()}</div>
-                      <div className='stocks__stock-info'>Last Updated: {stock.lastUpdated}</div>
+                      <div className='stocks__stock-ticker'>{stock.name}</div>
+                      {
+                        stock.lastUpdated === '' ? <div></div> :
+                        <div>
+                          <div className='stocks__stock-info'>Last Updated: {stock.lastUpdated}</div>
+                          <div className='stocks__delete-stock' onClick={() => this.deleteStock(stock.name)}>x</div>
+                        </div>
+                      }
                     </div>
                   );
                 })
               )
             }
-            <div className='stocks__stock stocks__add-stock' onClick={() => console.log(this.state.stocks)}>
+            <div className='stocks__stock stocks__add-stock'>
               <form className='form' onSubmit={this.onSubmit}>
                 <input 
                   name='newStock'
@@ -92,7 +111,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  startAddStock: (stock) => dispatch(startAddStock(stock))
+  startAddStock: (stock) => dispatch(startAddStock(stock)),
+  startRemoveStock: (ticker) => dispatch(startRemoveStock(ticker))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardPage);

@@ -5,6 +5,16 @@
     border: 1px solid black;
     height: 6rem;
     margin: 0.6rem;
+    position: relative;
     width: 30rem;
+    .stocks__delete-stock {
+      cursor: pointer;
+      font-size: 125%;
+      height: 1rem;
+      position: absolute;
+      right: 1rem;
+      top: -1rem;
+      width: 1rem;
+    }
   }
 }
