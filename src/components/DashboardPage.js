@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import StockChart from './StockChart';
 import { startAddStock, startRemoveStock } from '../actions/stocks';
 
 class DashboardPage extends React.Component {
@@ -61,7 +62,7 @@ class DashboardPage extends React.Component {
     return (
       <div>
         <div className='stocks'>
-          <div className='stocks__chart'>Chart</div>
+          <StockChart data={this.props.stocks} />
           <div className='stocks__watching'>
             {
               this.props.stocks.length === 0 ? (
