@@ -5,27 +5,33 @@ import * as d3 from 'd3';
 export default class StockChart extends React.Component {
   render() {
     const div = new ReactFauxDOM.Element('div');
-    let stockMax;
     const rawData = this.props.data;
+    const stockMax = d3.max(rawData.map((stock) => d3.max(stock.closingValues.map((d) => parseInt(d.price)))));
     const smallestDataSetSize = d3.min(rawData.map((stock) => stock.closingValues.length));
     const restrictingDataSet = rawData.filter((stock) => stock.closingValues.length === smallestDataSetSize)[0];
-    const stockLines = [];
+    const stockPoints = [];
+    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'grey'];
     const parseTime = d3.timeParse('%Y-%m-%d');
+    const bisectDate = d3.bisector((d) => d.date).left;
     const margin = {top: 20, right: 40, bottom: 70, left: 40}
-    const width = window.innerWidth - margin.left - margin.right;
-    const height = window.innerHeight - margin.top - margin.bottom - 75*2; // -75 for header and for bottom stock info
+    const width = Math.min(1000-margin.left-margin.right, window.innerWidth - 2*(margin.left + margin.right)); // one margin for the chart padding, one for the margin outside the chart
+    const height = Math.max(320, window.innerHeight - margin.top - margin.bottom - 75*2); // -75 for header and for bottom stock info, minimum for landscape view on mobile devices
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
-    const xAxis = d3.axisBottom(x).ticks(10).tickFormat(d3.timeFormat('%b %d, %Y'));
-    const yAxis = d3.axisLeft(y).ticks(5);
+    const xAxisTicks = 10;
+    const yAxisTicks = 5;
+    const xAxis = d3.axisBottom(x).ticks(xAxisTicks).tickFormat(d3.timeFormat('%b %d, %Y'));
+    const yAxis = d3.axisLeft(y).ticks(yAxisTicks);
 
-    // Get prelimiary data to set up chart
-    // fix these to only use valid dates
-    stockMax = d3.max(rawData.map((stock) => d3.max(stock.closingValues.map((d) => parseInt(d.price)))));
+    // Style the div for the chart before working on building it with D3
+    div.style.setProperty('display', 'flex');
+    div.style.setProperty('justify-content', 'space-around');
     
     // Fromat data into a JSON format that can be used with D3
     const data = { stocks: []};
-    for (let i = smallestDataSetSize - 1; i > -1; i--) {
+    // change this to go over all of the data and set all non-existant data to 0, then multicolor the line and make it transparent (for the tooltip, check for price of 0 for exception)
+    for (let i = smallestDataSetSize - 1; i > 4; i-=5) {
+      // we smooth the data and speed up the rendering by only picking every fifth data point
       const date = restrictingDataSet.closingValues[i].date;
       data.stocks.push({
         'date': date
@@ -36,7 +42,10 @@ export default class StockChart extends React.Component {
       });
     }
 
-    // Draw the plot
+    // Make grid lines for the y-axis so data is easier to read
+    const make_y_gridlines = () => d3.axisLeft(y).ticks(yAxisTicks);
+
+    // Make the line chart and load data to display
     let svg = d3.select(div).append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.bottom + margin.top)
@@ -47,7 +56,15 @@ export default class StockChart extends React.Component {
     y.domain([0, stockMax*11/10]);
 
     svg.append('g')
+      .attr('class', 'grid')
+      .call(make_y_gridlines()
+        .tickSize(-width)
+        .tickFormat('')
+      )
+
+    svg.append('g')
       .attr('transform', `translate(0, ${height})`)
+      .attr('class', 'chart--axis')
       .call(xAxis)
       .selectAll('text')
         .style('text-anchor', 'end')
@@ -56,37 +73,80 @@ export default class StockChart extends React.Component {
         .attr('transform', 'rotate(-65)');
     
     svg.append('g')
+      .attr('class', 'chart--axis')
       .call(yAxis);
-
-    const valueline = d3.line()
-      .x((d) => x(d.date))
-      .y((d) => y(d['GOOG']));
 
     data.stocks.forEach((d) => {
       d.date = parseTime(d.date);
-      d['GOOG'] = +d['GOOG'];
     });
 
-    rawData.map((stock) => {
-      data.stocks.map((stockData) => {
-        const stockLine = d3.line()
+    rawData.map((stock, index) => {
+      data.stocks.map(() => {
+        const stockPoint = d3.line()
           .x((d) => x(d.date))
           .y((d) => y(d[stock.name]));
-        stockLines.push(stockLine);
-      })
+        stockPoints.push([stockPoint, colours[index%colours.length]]);
+      });
     });
 
-    const colours = ['steelblue', 'red', 'green', 'blue', 'pink', 'yellow'];
-
-    stockLines.forEach((stockLine) => {
-      let stockColour;
-        stockColour = colours[stockLines.indexOf(stockLine)%6];
+    stockPoints.map((stockPoint) => {
       svg.append('path')
         .datum(data.stocks)
         .attr('class', 'line')
-        .attr('stroke', stockColour)
-        .attr('d', stockLine);
+        .attr('stroke', stockPoint[1])
+        .attr('d', stockPoint[0]);
     });
+
+    // Add tooltip on hover, displaying all stock prices at a hovered date
+    const tooltip = svg.append('g')
+      .attr('class', 'tooltip')
+      .style('display', 'none');
+
+    tooltip.append('line')
+      .attr('class', 'tooltip__line')
+      .attr('y1', 0)
+      .attr('y2', height);
+
+    tooltip.append('circle')
+      .attr('r', 5);
+
+    tooltip.append('text')
+      .attr('x', 15)
+      .attr('dy', '0.3rem')
+
+    svg.append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .attr('fill', 'rgba(0,0,0,0.5)')
+      .attr('pointer-events', 'all')
+      .on('mouseover', () => tooltip.style('display', null))
+      .on('mouseout', () => tooltip.style('display', 'none'))
+      .on('mousemove', mousemove)
+
+    function invertTimePosition(xPos) {
+      const domain = x.domain();
+      const range = x.range();
+      const domainPoints = data.stocks.map((d) => d.date);
+      const rangePoints = d3.range(range[0], range[1], data.stocks.length/smallestDataSetSize);
+      //console.log('dur', domainPoints.length);
+      console.log(rangePoints.length, smallestDataSetSize);
+      //console.log(xPos, d3.bisect(rangePoints, xPos), domainPoints.length);
+      //console.log(range[0], domainPoints[d3.bisect(rangePoints, xPos)-1], range[1]);
+      return domain[d3.bisect(rangePoints, xPos) - 1];
+    }
+
+    function mousemove() {
+      const x0 = x(invertTimePosition(d3.event.clientX));
+      const i = bisectDate(data.stocks, x0, 1);
+      const d0 = data.stocks[i-1];
+      console.log(d0);
+      const d1 = data.stocks[i];
+      const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+      
+      tooltip.attr('transform', `translate(x(d.date), y(${height}))`)
+      tooltip.select('text').text(() => 'stock values')
+      tooltip.select('tooltip__line').attr('y2', height - y(height))
+    }
 
     return div.toReact();
   }

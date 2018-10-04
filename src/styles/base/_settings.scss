@@ -4,6 +4,7 @@ $dark-grey: #333;
 $blue: #1C88BF;
 $grey: #666;
 $off-white: #f7f7f7;
+$stock-blue: linear-gradient(to bottom right, lighten($blue, 10%), $blue);
 // Font size
 $font-size-large: 1.8rem;
 $font-size-small: 1.2rem;
