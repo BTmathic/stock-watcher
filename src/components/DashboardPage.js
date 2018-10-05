@@ -6,13 +6,9 @@ import { startAddStock, startRemoveStock } from '../actions/stocks';
 class DashboardPage extends React.Component {
   state = {
     err: '',
+    hover: '',
     newStock: '',
     stocks: []
-  }
-
-  handleInput = (e) => {
-    const newStock = e.target.value;
-    this.setState(() => ({ newStock }));
   }
 
   deleteStock = (ticker) => {
@@ -20,6 +16,11 @@ class DashboardPage extends React.Component {
     const oldStocks = this.state.stocks;
     const stocks = oldStocks.filter((stock) => stock.name !== ticker);
     this.setState(() => ({ stocks }));
+  }
+
+  handleInput = (e) => {
+    const newStock = e.target.value;
+    this.setState(() => ({ newStock }));
   }
 
   loadStockData = (newStock) => {
@@ -69,13 +70,14 @@ class DashboardPage extends React.Component {
   }
 
   render() {
+    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'grey'];
     return (
       <div className='dashboard'>
         <div className='stocks'>
           <div className='content-container dashboard--title'>
             <h2>Stock Data</h2>
           </div>
-          <StockChart data={this.props.stocks} />
+          <StockChart data={this.props.stocks} colours={colours} />
           <div className='content-container'>
             <div className='stocks__watching'>
               {
@@ -84,9 +86,9 @@ class DashboardPage extends React.Component {
                     <span>Enter a ticker to begin</span>
                   </div>
                 ) : (
-                    this.props.stocks.map((stock) => {
+                    this.props.stocks.map((stock, index) => {
                       return (
-                        <div className='stocks__stock' key={stock.name}>
+                        <div className='stocks__stock' key={stock.name} ref={`this.stock${index}ref`}> {/* style={{borderLeft: 0.7 + `rem solid white`}}>*/}
                           <div className='stocks__stock-ticker'>{stock.name}</div>
                           {
                             stock.lastUpdated === '' ? <div></div> :

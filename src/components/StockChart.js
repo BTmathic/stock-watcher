@@ -10,7 +10,7 @@ export default class StockChart extends React.Component {
     const smallestDataSetSize = d3.min(rawData.map((stock) => stock.closingValues.length));
     const restrictingDataSet = rawData.filter((stock) => stock.closingValues.length === smallestDataSetSize)[0];
     const stockPoints = [];
-    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'grey'];
+    const colours = this.props.colours;
     const parseTime = d3.timeParse('%Y-%m-%d');
     const bisectDate = d3.bisector((d) => d.date).left;
     const margin = {top: 20, right: 40, bottom: 70, left: 40}
@@ -31,7 +31,7 @@ export default class StockChart extends React.Component {
     const data = { stocks: []};
     // change this to go over all of the data and set all non-existant data to 0, then multicolor the line and make it transparent (for the tooltip, check for price of 0 for exception)
     for (let i = smallestDataSetSize - 1; i > 4; i-=5) {
-      // we smooth the data and speed up the rendering by only picking every fifth data point
+      // we can smooth out the data and speed up the rendering by only picking every second-fifth data point if data sets are very large?
       const date = restrictingDataSet.closingValues[i].date;
       data.stocks.push({
         'date': date
@@ -47,6 +47,7 @@ export default class StockChart extends React.Component {
 
     // Make the line chart and load data to display
     let svg = d3.select(div).append('svg')
+      .attr('class', 'stocks__chart')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.bottom + margin.top)
       .append('g')
@@ -60,7 +61,7 @@ export default class StockChart extends React.Component {
       .call(make_y_gridlines()
         .tickSize(-width)
         .tickFormat('')
-      )
+      );
 
     svg.append('g')
       .attr('transform', `translate(0, ${height})`)
@@ -98,17 +99,15 @@ export default class StockChart extends React.Component {
     });
 
     // Add tooltip on hover, displaying all stock prices at a hovered date
-    const tooltip = svg.append('g')
+    const tooltip = d3.select('body')
+      .append('div')
       .attr('class', 'tooltip')
-      .style('display', 'none');
+      .style('opacity', 0);
 
     tooltip.append('line')
       .attr('class', 'tooltip__line')
       .attr('y1', 0)
       .attr('y2', height);
-
-    tooltip.append('circle')
-      .attr('r', 5);
 
     tooltip.append('text')
       .attr('x', 15)
@@ -117,35 +116,30 @@ export default class StockChart extends React.Component {
     svg.append('rect')
       .attr('width', width)
       .attr('height', height)
-      .attr('fill', 'rgba(0,0,0,0.5)')
+      .attr('fill', 'none')
       .attr('pointer-events', 'all')
-      .on('mouseover', () => tooltip.style('display', null))
-      .on('mouseout', () => tooltip.style('display', 'none'))
-      .on('mousemove', mousemove)
-
-    function invertTimePosition(xPos) {
-      const domain = x.domain();
-      const range = x.range();
-      const domainPoints = data.stocks.map((d) => d.date);
-      const rangePoints = d3.range(range[0], range[1], data.stocks.length/smallestDataSetSize);
-      //console.log('dur', domainPoints.length);
-      console.log(rangePoints.length, smallestDataSetSize);
-      //console.log(xPos, d3.bisect(rangePoints, xPos), domainPoints.length);
-      //console.log(range[0], domainPoints[d3.bisect(rangePoints, xPos)-1], range[1]);
-      return domain[d3.bisect(rangePoints, xPos) - 1];
-    }
+      .on('mouseover', () => tooltip.style('opacity', '1'))
+      .on('mouseout', () => tooltip.style('opacity', '0'))
+      .on('mousemove', mousemove);
 
     function mousemove() {
-      const x0 = x(invertTimePosition(d3.event.clientX));
+      const xMarginOffset = 73; // the data on the x-axis starts at x-position 73px
+      const x0 = x.invert(d3.event.clientX - xMarginOffset);
       const i = bisectDate(data.stocks, x0, 1);
       const d0 = data.stocks[i-1];
-      console.log(d0);
       const d1 = data.stocks[i];
       const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-      
-      tooltip.attr('transform', `translate(x(d.date), y(${height}))`)
-      tooltip.select('text').text(() => 'stock values')
-      tooltip.select('tooltip__line').attr('y2', height - y(height))
+      //tooltip.attr('transform', `translate(${x(d.date)}, ${y.invert(d3.event.clientY) + height + 800})`)
+      tooltip.style('left', `${d3.event.clientX + 15}px`);
+      tooltip.style('top', `${d3.event.clientY - 30}px`);
+      tooltip.html(
+        rawData.map((stock, index) =>
+        `<div class="tooltip__square" style="background:${colours[index%colours.length]}"></div>` + 
+        `${stock.name}: ${stock.closingValues[0].price}`).toString().replace(/,/g, '<br/>')
+      );
+      tooltip.select('tooltip__line').attr('x1', x(d3.event.clientX));
+      tooltip.select('tooltip__line').attr('x2', x(d3.event.clientX));
+      //tooltip.select('tooltip__line').attr('y2', height - y.invert(d3.event.clientY) + height + 800);
     }
 
     return div.toReact();

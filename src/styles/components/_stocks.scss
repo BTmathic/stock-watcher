@@ -12,6 +12,7 @@
     justify-content: space-evenly;
     .stocks__stock {
       background: $stock-blue;
+      border-left: 0.7rem solid white;
       border-radius: 5px;
       margin: 0.6rem;
       padding-left: 1rem;
@@ -65,33 +66,41 @@
     color: $off-white;
     margin-left: 3.3%;
   }
+  .stocks__chart {
+    background: lighten(black, 10%);
+    border-radius: 5px;
+    margin: 2rem 0;
+    .chart--axis {
+      color: $off-white;
+    }
+    .grid {
+      color: lighten($off-white, 10%);
+    }
+    .line {
+      border: none;
+      fill: none;
+      shape-rendering: crispEdges;
+      stroke-width: 0.3rem;
+    }
+  }
 }
 
-svg {
-  background: lighten(black, 10%);
-  border-radius: 5px;
-  margin: 2rem 0;
-  .chart--axis {
-    color: $off-white;
+.tooltip {
+  background: grey;
+  border: 0px;
+  border-radius: 8px;
+  color: $off-white;
+  font: 12px sans-serif;
+  padding: 1rem;
+  position: absolute;
+  .tooltip__line {
+    stroke: white;
+    stroke-width: 1px;
   }
-  .grid {
-    color: lighten($off-white, 10%);
-  }
-  .line {
-    border: none;
-    fill: none;
-    shape-rendering: crispEdges;
-    stroke-width: 0.3rem;
-  }
-  .tooltip {
-    position: absolute;
-    text-align: center;
-    width: 150px;
-    height: 28px;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 8px;
+  .tooltip__square {
+    display: inline-block;
+    height: 0.9rem;
+    margin-right: 0.3rem;
+    width: 0.9rem;
   }
 }
