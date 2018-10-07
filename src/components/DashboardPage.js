@@ -4,18 +4,30 @@ import StockChart from './StockChart';
 import { startAddStock, startRemoveStock } from '../actions/stocks';
 
 class DashboardPage extends React.Component {
+  constructor() {
+    super();
+    this.stockRefs = [];
+  }
+
   state = {
     err: '',
     hover: '',
     newStock: '',
+    removeStock: '',
     stocks: []
   }
 
   deleteStock = (ticker) => {
-    this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id);
-    const oldStocks = this.state.stocks;
-    const stocks = oldStocks.filter((stock) => stock.name !== ticker);
-    this.setState(() => ({ stocks }));
+    this.setState(() => ({ removeStock: ticker }))
+    setTimeout(() => {
+      this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id);
+      const oldStocks = this.state.stocks;
+      const stocks = oldStocks.filter((stock) => stock.name !== ticker);
+      this.setState(() => ({
+        removeStock: '',
+        stocks
+      }));
+    }, 1000);
   }
 
   handleInput = (e) => {
@@ -70,7 +82,7 @@ class DashboardPage extends React.Component {
   }
 
   render() {
-    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'grey'];
+    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
     return (
       <div className='dashboard'>
         <div className='stocks'>
@@ -88,13 +100,16 @@ class DashboardPage extends React.Component {
                 ) : (
                     this.props.stocks.map((stock, index) => {
                       return (
-                        <div className='stocks__stock' key={stock.name} ref={`this.stock${index}ref`}> {/* style={{borderLeft: 0.7 + `rem solid white`}}>*/}
+                        <div
+                          className={this.state.removeStock === stock.name ? 'stocks__stock stocks--removal-animation' : 'stocks__stock'}
+                          key={stock.name}
+                          style={{borderLeft: 0.7 + `rem solid ${colours[index%colours.length]}`}}>
                           <div className='stocks__stock-ticker'>{stock.name}</div>
                           {
                             stock.lastUpdated === '' ? <div></div> :
                               <div>
                                 <div className='stocks__stock-info'>Last Updated: {stock.lastUpdated}</div>
-                                <div className='stocks__delete-stock' onClick={() => this.deleteStock(stock.name)}>x</div>
+                                <div className='stocks__delete-stock' onClick={(e) => this.deleteStock(stock.name)}>x</div>
                               </div>
                           }
                         </div>
@@ -118,8 +133,6 @@ class DashboardPage extends React.Component {
                   <input type='submit' className='stocks__submit-stock-ticker' />
                 </form>
               </div>
-              <div className='stocks__blank'></div>
-              <div className='stocks__blank'></div>
             </div>
             <div className='stock__error'>{this.state.err}</div>
           </div>

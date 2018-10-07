@@ -3,6 +3,11 @@ import ReactFauxDOM from 'react-faux-dom';
 import * as d3 from 'd3';
 
 export default class StockChart extends React.Component {
+  // need to force a state change (rerender) for the tooltip to display with CSS position: absolute
+  componentDidMount() {
+    this.setState(() => ({ rerender: true }));
+  }
+
   render() {
     const div = new ReactFauxDOM.Element('div');
     const rawData = this.props.data;
@@ -98,20 +103,15 @@ export default class StockChart extends React.Component {
         .attr('d', stockPoint[0]);
     });
 
-    // Add tooltip on hover, displaying all stock prices at a hovered date
+    // Add tooltip when hovering over chart, only once on page load, not every re-render
+    // (e.g., when new stocks are added)
     const tooltip = d3.select('body')
+      .selectAll('div.tooltip')
+      .data([0]); // load arbitrary data to prevent another append on re-render
+    tooltip.enter()
       .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-
-    tooltip.append('line')
-      .attr('class', 'tooltip__line')
-      .attr('y1', 0)
-      .attr('y2', height);
-
-    tooltip.append('text')
-      .attr('x', 15)
-      .attr('dy', '0.3rem')
 
     svg.append('rect')
       .attr('width', width)
@@ -129,13 +129,17 @@ export default class StockChart extends React.Component {
       const d0 = data.stocks[i-1];
       const d1 = data.stocks[i];
       const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-      //tooltip.attr('transform', `translate(${x(d.date)}, ${y.invert(d3.event.clientY) + height + 800})`)
-      tooltip.style('left', `${d3.event.clientX + 15}px`);
-      tooltip.style('top', `${d3.event.clientY - 30}px`);
+      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+      const tooltipData = [];
+      const screenScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      rawData.map((stock) => tooltipData.push(`${stock.name}: ${d[stock.name]}`));
+      tooltip.style('left', d3.event.clientX < width*.85 ? d3.event.clientX + 25 + 'px' : d3.event.clientX - 150 + 'px');
+      tooltip.style('top', `${d3.event.clientY + screenScroll}px`);
       tooltip.html(
-        rawData.map((stock, index) =>
+        d.date.toLocaleDateString('en-US', dateOptions).toString().replace(/,/g, '') + '<br/>' +
+        tooltipData.map((stock, index) =>
         `<div class="tooltip__square" style="background:${colours[index%colours.length]}"></div>` + 
-        `${stock.name}: ${stock.closingValues[0].price}`).toString().replace(/,/g, '<br/>')
+        stock).toString().replace(/,/g, '<br/>')
       );
       tooltip.select('tooltip__line').attr('x1', x(d3.event.clientX));
       tooltip.select('tooltip__line').attr('x2', x(d3.event.clientX));
