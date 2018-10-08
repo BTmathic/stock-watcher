@@ -4,12 +4,8 @@ import StockChart from './StockChart';
 import { startAddStock, startRemoveStock } from '../actions/stocks';
 
 class DashboardPage extends React.Component {
-  constructor() {
-    super();
-    this.stockRefs = [];
-  }
-
   state = {
+    dataUpTo: '',
     err: '',
     hover: '',
     newStock: '',
@@ -71,7 +67,11 @@ class DashboardPage extends React.Component {
               price: values[date]['4. close']
             }));
             const newStock = { name, lastUpdated, closingValues };
-            this.loadStockData(newStock);
+            if (lastUpdated !== this.state.dataUpTo) {
+              this.setState(() => ({ err: `Data not updated recently for ${this.state.newStock.toUpperCase()}`}));
+            } else {
+              this.loadStockData(newStock);
+            }
           } else {
             this.setState(() => ({ err: `No stock with ticker ${this.state.newStock.toUpperCase()} found`}))
           }

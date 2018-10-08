@@ -35,7 +35,7 @@ export default class StockChart extends React.Component {
     // Fromat data into a JSON format that can be used with D3
     const data = { stocks: []};
     // change this to go over all of the data and set all non-existant data to 0, then multicolor the line and make it transparent (for the tooltip, check for price of 0 for exception)
-    for (let i = smallestDataSetSize - 1; i > 4; i-=5) {
+    for (let i = smallestDataSetSize - 1; i > 0; i--) {
       // we can smooth out the data and speed up the rendering by only picking every second-fifth data point if data sets are very large?
       const date = restrictingDataSet.closingValues[i].date;
       data.stocks.push({
@@ -43,7 +43,17 @@ export default class StockChart extends React.Component {
       });
       rawData.map((stock) => {
         const stockData = stock.closingValues.filter((stockData) => stockData.date === date);
-        data.stocks[data.stocks.length - 1][stock.name] = parseFloat(stockData[0].price);
+        if (stockData[0] === undefined) {
+          console.log(date);
+          data.stocks[data.stocks.length - 1][stock.name] = 0; // no data available
+        } else {
+          if (data.stocks.length > 1) {
+            if (data.stocks[data.stocks.length - 2][stock.name] === 0) {
+              //console.log(data.stocks);
+            }
+          }
+          data.stocks[data.stocks.length - 1][stock.name] = parseFloat(stockData[0].price);
+        } 
       });
     }
 
@@ -141,9 +151,6 @@ export default class StockChart extends React.Component {
         `<div class="tooltip__square" style="background:${colours[index%colours.length]}"></div>` + 
         stock).toString().replace(/,/g, '<br/>')
       );
-      tooltip.select('tooltip__line').attr('x1', x(d3.event.clientX));
-      tooltip.select('tooltip__line').attr('x2', x(d3.event.clientX));
-      //tooltip.select('tooltip__line').attr('y2', height - y.invert(d3.event.clientY) + height + 800);
     }
 
     return div.toReact();
