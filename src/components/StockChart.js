@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactFauxDOM from 'react-faux-dom';
 import * as d3 from 'd3';
+import { connect } from 'react-redux';
 
-export default class StockChart extends React.Component {
+class StockChart extends React.Component {
   // need to force a state change (rerender) for the tooltip to display with CSS position: absolute
   componentDidMount() {
     this.setState(() => ({ rerender: true }));
@@ -10,7 +11,8 @@ export default class StockChart extends React.Component {
 
   render() {
     const div = new ReactFauxDOM.Element('div');
-    const rawData = this.props.data;
+    const stockTickers = this.props.data;
+    const rawData = stockTickers.map((ticker) => this.props.stockData.filter((stock) => stock.name === ticker.name)[0]);
     const stockMax = d3.max(rawData.map((stock) => d3.max(stock.closingValues.map((d) => parseInt(d.price)))));
     const smallestDataSetSize = d3.min(rawData.map((stock) => stock.closingValues.length));
     const restrictingDataSet = rawData.filter((stock) => stock.closingValues.length === smallestDataSetSize)[0];
@@ -43,17 +45,7 @@ export default class StockChart extends React.Component {
       });
       rawData.map((stock) => {
         const stockData = stock.closingValues.filter((stockData) => stockData.date === date);
-        if (stockData[0] === undefined) {
-          console.log(date);
-          data.stocks[data.stocks.length - 1][stock.name] = 0; // no data available
-        } else {
-          if (data.stocks.length > 1) {
-            if (data.stocks[data.stocks.length - 2][stock.name] === 0) {
-              //console.log(data.stocks);
-            }
-          }
-          data.stocks[data.stocks.length - 1][stock.name] = parseFloat(stockData[0].price);
-        } 
+        data.stocks[data.stocks.length - 1][stock.name] = parseFloat(stockData[0].price);
       });
     }
 
@@ -115,44 +107,52 @@ export default class StockChart extends React.Component {
 
     // Add tooltip when hovering over chart, only once on page load, not every re-render
     // (e.g., when new stocks are added)
-    const tooltip = d3.select('body')
-      .selectAll('div.tooltip')
-      .data([0]); // load arbitrary data to prevent another append on re-render
-    tooltip.enter()
-      .append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
+    if (this.props.data.length > 0) {
+      const tooltip = d3.select('body')
+        .selectAll('div.tooltip')
+        .data([0]); // load arbitrary data to prevent another append on re-render
+      tooltip.enter()
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
 
-    svg.append('rect')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('fill', 'none')
-      .attr('pointer-events', 'all')
-      .on('mouseover', () => tooltip.style('opacity', '1'))
-      .on('mouseout', () => tooltip.style('opacity', '0'))
-      .on('mousemove', mousemove);
+      svg.append('rect')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('fill', 'none')
+        .attr('pointer-events', 'all')
+        .on('mouseover', () => tooltip.style('opacity', '1'))
+        .on('mouseout', () => tooltip.style('opacity', '0'))
+        .on('mousemove', mousemove);
 
-    function mousemove() {
-      const xMarginOffset = 73; // the data on the x-axis starts at x-position 73px
-      const x0 = x.invert(d3.event.clientX - xMarginOffset);
-      const i = bisectDate(data.stocks, x0, 1);
-      const d0 = data.stocks[i-1];
-      const d1 = data.stocks[i];
-      const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-      const tooltipData = [];
-      const screenScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      rawData.map((stock) => tooltipData.push(`${stock.name}: ${d[stock.name]}`));
-      tooltip.style('left', d3.event.clientX < width*.85 ? d3.event.clientX + 25 + 'px' : d3.event.clientX - 150 + 'px');
-      tooltip.style('top', `${d3.event.clientY + screenScroll}px`);
-      tooltip.html(
-        d.date.toLocaleDateString('en-US', dateOptions).toString().replace(/,/g, '') + '<br/>' +
-        tooltipData.map((stock, index) =>
-        `<div class="tooltip__square" style="background:${colours[index%colours.length]}"></div>` + 
-        stock).toString().replace(/,/g, '<br/>')
-      );
+      function mousemove() {
+        const xMarginOffset = 73; // the data on the x-axis starts at x-position 73px
+        const x0 = x.invert(d3.event.clientX - xMarginOffset);
+        const i = bisectDate(data.stocks, x0, 1);
+        const d0 = data.stocks[i - 1];
+        const d1 = data.stocks[i];
+        const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        const tooltipData = [];
+        const screenScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        rawData.map((stock) => tooltipData.push(`${stock.name}: ${d[stock.name]}`));
+        tooltip.style('left', d3.event.clientX < width * .85 ? d3.event.clientX + 25 + 'px' : d3.event.clientX - 150 + 'px');
+        tooltip.style('top', `${d3.event.clientY + screenScroll}px`);
+        tooltip.html(
+          d.date.toLocaleDateString('en-US', dateOptions).toString().replace(/,/g, '') + '<br/>' +
+          tooltipData.map((stock, index) =>
+            `<div class="tooltip__square" style="background:${colours[index % colours.length]}"></div>` +
+            stock).toString().replace(/,/g, '<br/>')
+        );
+      }
     }
 
     return div.toReact();
   }
 }
+
+const mapStateToProps = (state) => ({
+  stockData: state.stockData
+});
+
+export default connect(mapStateToProps)(StockChart);

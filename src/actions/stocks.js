@@ -1,30 +1,25 @@
 import database from '../firebase/firebase';
 
+// Add stock to user portfolio
 export const addStock = (stock) => ({
   type: 'ADD_STOCK',
   stock
 });
 
-export const startAddStock = (stockData = {}) => {
+export const startAddStock = (name = '') => {
   return (dispatch, getState) => {
     const uid = getState().auth.uid;
-    const {
-      name = '',
-      lastUpdated = new Date(),
-      closingValues = 0
-    } = stockData;
-    const stock = { name, lastUpdated, closingValues };
 
-    return database.ref(`users/${uid}/stocks`).push(stock).then((ref) => {
+    return database.ref(`users/${uid}/stocks`).push(name).then((ref) => {
       dispatch(addStock({
         id: ref.key,
-        ...stock
+        name
       }));
     });
-  }
-};
+  };
+}
 
-// Remove
+// Remove stock from user portfolio
 export const removeStock = (id = '') => ({
   type: 'REMOVE_STOCK',
   id
@@ -39,7 +34,7 @@ export const startRemoveStock = (id) => {
   };
 };
 
-// Set
+// Set stocks from user portfolio
 export const setStocks = (stocks) => ({
   type: 'SET_STOCKS',
   stocks
@@ -48,16 +43,15 @@ export const setStocks = (stocks) => ({
 export const startSetStocks = () => {
   return (dispatch, getState) => {
     const uid = getState().auth.uid;
-    return database.ref(`users/${uid}/stocks`).once('value')
-      .then((snapshot) => {
-        const stocks = [];
-        snapshot.forEach((childSnapshot) => {
-          stocks.push({
-            id: childSnapshot.key,
-            ...childSnapshot.val()
-          });
+    return database.ref(`users/${uid}/stocks`).once('value').then((snapshot) => {
+      const stocks = [];
+      snapshot.forEach((childSnapshot) => {
+        stocks.push({
+          id: childSnapshot.key,
+          name: childSnapshot.val()
         });
-        dispatch(setStocks(stocks));
       });
+      dispatch(setStocks(stocks));
+    });
   };
 };

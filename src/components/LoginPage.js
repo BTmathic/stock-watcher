@@ -3,7 +3,7 @@ import Header from './Header';
 import Example from './Example';
 
 export const LoginPage = () => (
-  <div>
+  <div className='main-page'>
     <Header />
     <div className='landing-image'>
       <p>Watch your portfolio with ease</p>

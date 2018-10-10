@@ -6,6 +6,7 @@ import configureStore from './store/configureStore';
 import LoadingPage from './components/LoadingPage';
 import { login, logout } from './actions/auth';
 import { firebase } from './firebase/firebase';
+import { startSetStockData } from './actions/stockData';
 import { startSetStocks } from './actions/stocks';
 
 import 'normalize.css/normalize.css';
@@ -32,8 +33,11 @@ ReactDOM.render(<LoadingPage />, document.getElementById('app'));
 
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
-    store.dispatch(login(user.uid));
-    store.dispatch(startSetStocks()).then(() => {
+    Promise.all([
+      store.dispatch(login(user.uid)),
+      store.dispatch(startSetStockData()),
+      store.dispatch(startSetStocks())
+    ]).then(() => {
       renderApp();
       if (history.location.pathname === '/') {
         history.push('/dashboard');
