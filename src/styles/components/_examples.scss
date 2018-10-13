@@ -1,0 +1,128 @@
+.examples {
+  margin-top: -9.5rem; // only for widest display, needs adjusting for responsive after fixing the width of the description for each media query
+  .example-container {
+    position: relative;
+    .description {
+      margin: -6rem auto;
+    }
+    .socials {
+      margin: -4rem auto;
+      .socials__logos {
+        display: flex;
+        justify-content: center;
+        .socials__logo--fb {
+          background: #575FAE;
+          color: white;
+        }
+        .socials__logo--twitter {
+          background: #489CF1;
+          color: white;
+        }
+        .socials__logo--email {
+          background: white;
+          border: 2px solid black;
+          color: black;
+        }
+        .socials__logo {
+          align-items: center;
+          border-radius: 25px;
+          display: flex;
+          font-size: 90%;
+          font-weight: bold;
+          justify-content: space-around;
+          margin: 1rem 2rem;
+          padding: 1rem 2rem;
+          min-width: 15rem;
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
+      }
+    }
+    .description, .socials {
+      background: $off-white;
+      border-radius: 2rem;
+      left: 10%;
+      padding: 3rem 2rem;
+      position: absolute;
+      text-align: center;
+      top: -7.5%;
+      width: 80%;
+      z-index: 1;
+      .description--text {
+        margin: 0 auto;
+        width: 80%;
+      }
+      .description__logos {
+        display: flex;
+        justify-content: evenly;
+        margin: 0 auto;
+        padding-top: 2rem;
+        width: 60%;
+        .description__logo {
+          display: flex;
+          flex-direction: column;
+          font-size: 80%;
+          justify-content: space-around;
+          margin: 0 auto;
+          text-align: center;
+          img {
+            margin: 0.5rem auto;
+            width: 50%;
+          }
+        }
+        .logo-padding {
+          height: 0;
+          opacity: 0;
+        }
+      }
+    }
+    .example {
+      background: linear-gradient($dark-grey, #555);
+      color: $off-white;
+      display: flex;
+      justify-content: center;
+      padding: 15rem;
+      position: relative;
+      .example--image-container {
+        background: grey;
+        border-radius: 20px;
+        padding: 1rem 0;
+        width: 50%;
+        .example--image1 {
+          background: url('/Images/example1.png');
+          background-size: cover;
+          border-radius: 15px;
+          height: 0;
+          margin: 0 auto;
+          padding-top: 40%;
+          width: 80%;
+        }
+        .example--image2 {
+          background: url('/Images/example1.png');
+          background-size: cover;
+          border-radius: 15px;
+          height: 0;
+          margin: 0 auto;
+          padding-top: 40%;
+          width: 80%;
+        }
+        .example--image3 {
+          background: url('/Images/example1.png');
+          background-size: cover;
+          border-radius: 15px;
+          height: 0;
+          margin: 0 auto;
+          padding-top: 40%;
+          width: 80%;
+        }
+      }
+      .example--text {
+        padding: 2rem;
+        text-align: center;
+        width: 50%;
+      }
+    }
+  }
+}

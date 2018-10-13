@@ -11,7 +11,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// back end API for getting stock data
+// keep the stock data available for users despite the (5/minute) limit on API use
 apiRoutes(app);
 
 app.listen(port, () => {

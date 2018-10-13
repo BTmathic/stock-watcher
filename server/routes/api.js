@@ -38,30 +38,36 @@ const updateStock = (stock, stockId, snapshotIndex) => {
   });
 };
 
-module.exports = (app) => {
+const rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [1, new schedule.Range(2, 5)]; // stocks only trade Monday through Friday
+rule.hour = [new schedule.Range(10, 4)]; // the NASDAQ is only open between 9:30 and 16:00
+rule.minute = 5;
 
-  const rule = new schedule.RecurrenceRule();
-  rule.dayOfWeek = [1, new schedule.Range(2,5)]; // stocks only trade Monday through Friday
-  rule.hour = [new schedule.Range(10, 4)]; // the NASDAQ is only open between 9:30 and 16:00
-  rule.minute = 5;
-
-  const updateStocks = schedule.scheduleJob(rule, () => {
-    console.log('Starting stock update check/process');
-    let snapshotIndex = 0;
-    const currentDate = new Date();
-    currentDate.setHours(currentDate.getHours() - 4); // the NASDAQ operates on EST
-    ref.once('value', (snapshot) => {
-      snapshot.forEach((childSnapshot) => {
-        const stockId = childSnapshot.key;
-        const stock = childSnapshot.val();
-        const date = new Date(stock.lastUpdated);
-        if (date.getUTCDate() !== currentDate.getDate()) {
-          console.log(`${stock.name} is being updated`);
-          snapshotIndex++;
-          updateStock(stock, stockId, snapshotIndex);
-        }
-      });
+const updateStocks = () => {
+  console.log('Starting stock update check/process');
+  let snapshotIndex = 0;
+  const currentDate = new Date();
+  currentDate.setHours(currentDate.getHours() - 4); // the NASDAQ operates on EST
+  ref.once('value', (snapshot) => {
+    snapshot.forEach((childSnapshot) => {
+      const stockId = childSnapshot.key;
+      const stock = childSnapshot.val();
+      const date = new Date(stock.lastUpdated);
+      if (date.getUTCDate() !== currentDate.getDate()) {
+        console.log(`${stock.name} is being updated`);
+        snapshotIndex++;
+        updateStock(stock, stockId, snapshotIndex);
+      }
     });
   });
+}
+
+updateStocks(); // run once whenever going live, in case of extended server downtime
+
+const updateStocksJob = schedule.scheduleJob(rule, () => {
+  updateStocks();
+});
+
+module.exports = (app) => {
 
 }
