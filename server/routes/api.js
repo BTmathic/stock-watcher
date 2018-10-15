@@ -9,25 +9,39 @@ admin.initializeApp({
 });
 
 const db = admin.database();
-const ref = db.ref('/stocks');
+const ref = db.ref('stocks');
 
 const updateStock = (stock, stockId, snapshotIndex) => {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${stock.name}&apikey=${process.env.API_KEY}`)
+      console.log(`${stock.name} is being updated`);
+      fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stock.name}&apikey=${process.env.API_KEY}`)
         .then((resp) => resp.json())
         .then((json) => {
           const metaData = json['Meta Data'];
-          const values = json['Weekly Time Series'];
           const lastUpdated = metaData['3. Last Refreshed'].split(' ')[0];
-          const closingValues = Object.keys(values).map((date) => ({
+          const values = json['Time Series (Daily)'];
+          const dailyValues = Object.keys(values).map((date) => ({
             date,
-            price: values[date]['4. close']
+            open: values[date]['1. open'],
+            high: values[date]['2. high'],
+            low: values[date]['3. low'],
+            close: values[date]['4. close'],
+            volume: values[date]['5. volume']
           }));
+          const closingValues = dailyValues.map((value) => ({
+            date: value.date,
+            price: value.close
+          }));
+          let recentValues = [];
+          for (let i=0; i < 7; i++) {
+            recentValues.push(dailyValues[i]);
+          };
           ref.child(stockId).set({
             name: stock.name,
             lastUpdated,
-            closingValues
+            closingValues,
+            recentValues
           });
         })
         .catch((err) => {
@@ -40,7 +54,7 @@ const updateStock = (stock, stockId, snapshotIndex) => {
 
 const rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [1, new schedule.Range(2, 5)]; // stocks only trade Monday through Friday
-rule.hour = [new schedule.Range(10, 4)]; // the NASDAQ is only open between 9:30 and 16:00
+rule.hour = [10, new schedule.Range(11, 16)]; // the NASDAQ is only open between 9:30 and 16:00
 rule.minute = 5;
 
 const updateStocks = () => {
@@ -54,7 +68,6 @@ const updateStocks = () => {
       const stock = childSnapshot.val();
       const date = new Date(stock.lastUpdated);
       if (date.getUTCDate() !== currentDate.getDate()) {
-        console.log(`${stock.name} is being updated`);
         snapshotIndex++;
         updateStock(stock, stockId, snapshotIndex);
       }
@@ -62,7 +75,8 @@ const updateStocks = () => {
   });
 }
 
-updateStocks(); // run once whenever going live, in case of extended server downtime
+// run update (check) immediately when going live, in case of unplanned server downtime
+updateStocks();
 
 const updateStocksJob = schedule.scheduleJob(rule, () => {
   updateStocks();

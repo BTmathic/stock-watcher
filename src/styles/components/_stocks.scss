@@ -1,28 +1,43 @@
 .stocks {
-  margin-left: 23rem;
+  margin-left: 20rem;
   padding-bottom: 5rem;
   h2 {
     color: $off-white;
     margin: 0;
     padding-top: 2rem;
   }
-  #stocks__watching, #stocks__watching-add {
-    color: $off-white;
+  .stocks__watching, .stocks__watching-add {
+    color: black;
     display: flex;
     flex-wrap: wrap;
+    margin: 0 auto;
+    max-width: 1000px;
+    width: 100%;
     .stocks__stock {
       -webkit-animation-name: addStock;
       -webkit-animation-duration: 0.5s;
       animation-name: addStock;
       animation-duration: 0.5s;
-      background: $stock-blue;
+      background: $off-white;
       border-left: 0.7rem solid white;
+      border-right: 0.7rem solid white;
       border-radius: 5px;
       margin: 0.6rem;
+      padding-bottom: 0.2rem;
       padding-left: 1rem;
       padding-top: 0.3rem;
       position: relative;
       width: 31.5%;
+      .stocks__stock-ticker {
+        font-size: 110%;
+        font-weight: bold;
+      }
+      .stocks__stock-info {
+        font-size: 90%;
+        p {
+          margin: 0;
+        }
+      }
       .stocks--removal-animation {
         -webkit-animation-name: removeStock;
         -webkit-animation-duration: 0.5s;
@@ -34,8 +49,8 @@
         font-size: 125%;
         height: 1rem;
         position: absolute;
-        right: 1rem;
-        top: -0.3rem;
+        right: -0.2rem;
+        top: -0.7rem;
         width: 1rem;
       }
     }

@@ -1,24 +1,19 @@
 import database from '../firebase/firebase';
 
 // Add stock data
-export const addStockData = (stock) => ({
+export const addStockData = (stockData) => ({
   type: 'ADD_STOCK_DATA',
-  stock
+  stockData
 });
 
-export const startAddStockData = (stockData = {}) => {
+export const startAddStockData = ({ name, lastUpdated, closingValues} = {}) => {
   return (dispatch) => {
-    const {
-      name = '',
-      lastUpdated = new Date(),
-      closingValues = 0
-    } = stockData;
-    const stock = { name, lastUpdated, closingValues };
+    const stockData = { name, lastUpdated, closingValues };
 
-    return database.ref('stocks').push(stock).then((ref) => {
+    return database.ref('stocks').push(stockData).then((ref) => {
       dispatch(addStockData({
         id: ref.key,
-        ...stock
+        ...stockData
       }));
     });
   }

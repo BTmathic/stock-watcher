@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 export default () => (
   <div className='content-container'>
-    <div id='stock__details'>
+    <div className='stock__details' id='details'>
       <h2>Stock Details</h2>
       <div>Chart single stock</div>
       <div>Title (stock data for the latest full day)</div>

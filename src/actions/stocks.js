@@ -6,18 +6,19 @@ export const addStock = (stock) => ({
   stock
 });
 
-export const startAddStock = (name = '') => {
+export const startAddStock = ({ name, watching } = {}) => {
   return (dispatch, getState) => {
     const uid = getState().auth.uid;
+    const stock = { name, watching };
 
-    return database.ref(`users/${uid}/stocks`).push(name).then((ref) => {
+    return database.ref(`users/${uid}/stocks`).push(stock).then((ref) => {
       dispatch(addStock({
         id: ref.key,
-        name
+        ...stock
       }));
     });
   };
-}
+};
 
 // Remove stock from user portfolio
 export const removeStock = (id = '') => ({
@@ -30,6 +31,24 @@ export const startRemoveStock = (id) => {
     const uid = getState().auth.uid;
     return database.ref(`users/${uid}/stocks/${id}`).remove().then(() => {
       dispatch(removeStock(id));
+    });
+  };
+};
+
+// Toggle stock visibility in user chart
+export const editStock = (id = '', watching) => ({
+  type: 'EDIT_STOCK',
+  id,
+  watching
+});
+
+export const startEditStock = (id = '', watching = false) => {
+  return (dispatch, getState) => {
+    const uid = getState().auth.uid;
+    return database.ref(`users/${uid}/stocks/${id}`).update({
+      ...watching
+    }).then(() => {
+      dispatch(editStock(id, watching));
     });
   };
 };
@@ -48,7 +67,7 @@ export const startSetStocks = () => {
       snapshot.forEach((childSnapshot) => {
         stocks.push({
           id: childSnapshot.key,
-          name: childSnapshot.val()
+          ...childSnapshot.val()
         });
       });
       dispatch(setStocks(stocks));

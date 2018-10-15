@@ -8,7 +8,7 @@ import StockHistory from './StockHistory';
 import DashboardNavbar from './DashboardNavbar';
 import StockInformation from './StockInformation';
 import { startAddStockData } from '../actions/stockData';
-import { startAddStock, startRemoveStock } from '../actions/stocks';
+import { startAddStock, startEditStock, startRemoveStock } from '../actions/stocks';
 
 class DashboardPage extends React.Component {
   state = {
@@ -16,22 +16,23 @@ class DashboardPage extends React.Component {
     err: '',
     hover: '',
     newStock: '',
-    portfolio: []
+    portfolio: [],
+    removeStock: ''
   }
 
   deleteStock = (ticker) => {
-    setTimeout(() => { // timeout to let ticket fade out animation complete
-      this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id);
-      const oldPortfolio = this.state.portfolio;
-      const portfolio = oldPortfolio.filter((stock) => stock.name !== ticker);
-      this.setState(() => ({
-        err: '',
-        portfolio
-      }));
-      if (portfolio.length === 0) {
-        this.setState(() => ({ dataUpTo: '' }));
-      }
-    }, 1000);
+    this.setState(() => ({ removeStock: ticker }));
+    this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
+    const oldPortfolio = this.state.portfolio;
+    const portfolio = oldPortfolio.filter((stock) => stock !== ticker);
+    this.setState(() => ({
+      err: '',
+      portfolio,
+      removeStock: ''
+    }));
+    if (portfolio.length === 0) {
+      this.setState(() => ({ dataUpTo: '' }));
+    }
   }
 
   handleInput = (e) => {
@@ -40,7 +41,7 @@ class DashboardPage extends React.Component {
   }
 
   loadStockToDisplay = (newStock) => {
-    this.props.startAddStock(newStock.name);
+    this.props.startAddStock({name: newStock.name, watching: true});
     const portfolio = this.state.portfolio;
     portfolio.push(newStock.name);
     this.setState(() => ({
@@ -60,27 +61,40 @@ class DashboardPage extends React.Component {
     // As we are using a free API with a limit of 5 calls/minute, do not fetch data
     // if user is trying to add a stock already in their portfolio. Though we allow
     // refetching if user is updating old stock data
-    const portfolioStocks = this.state.portfolio.concat(this.props.stocks);
-    if (portfolioStocks.filter((stock) => stock.name === this.state.newStock.toUpperCase()).length === 0) {
+    const portfolioStocks = this.state.portfolio;//.concat(this.props.stocks);
+    if (portfolioStocks.filter((stock) => stock === this.state.newStock.toUpperCase()).length === 0) {
       const stockData = this.props.stockData.filter((stock) => stock.name === this.state.newStock.toUpperCase());
       if (stockData.length === 0) {
-        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${this.state.newStock}&apikey=${process.env.API_KEY}`)
+        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.state.newStock}&apikey=${process.env.API_KEY}`)
           .then((resp) => resp.json())
           .then((json) => {
             const metaData = json['Meta Data'];
             if (!!metaData) {
               const name = metaData['2. Symbol'].toUpperCase();
               const lastUpdated = metaData['3. Last Refreshed'].split(' ')[0];
-              const values = json['Weekly Time Series'];
-              const latestOpenValue = values[lastUpdated]['1. open'];
-              const latestLowValue = values[lastUpdated]['3. low'];
-              const latestHighValue = values[lastUpdated]['2. high'];
-              const latestVolumeValue = values[lastUpdated]['5. volume'];
-              const closingValues = Object.keys(values).map((date) => ({
+              const values = json['Time Series (Daily)'];
+              const dailyValues = Object.keys(values).map((date) => ({
                 date,
-                price: values[date]['4. close']
+                open: values[date]['1. open'],
+                high: values[date]['2. high'],
+                low: values[date]['3. low'],
+                close: values[date]['4. close'],
+                volume: values[date]['5. volume']
               }));
-              const newStock = { name, lastUpdated, closingValues };
+              const closingValues = dailyValues.map((value) => ({
+                date: value.date,
+                price: value.close
+              }));
+              let recentValues = [];
+              for (let i = 0; i < 7; i++) {
+                recentValues.push(dailyValues[i]);
+              };
+              const newStock = { 
+                name, 
+                lastUpdated, 
+                closingValues,
+                recentValues
+              };
               if (this.state.dataUpTo === '') {
                 this.setState(() => ({ dataUpTo: newStock.lastUpdated }));
                 this.props.startAddStockData(newStock);
@@ -106,7 +120,7 @@ class DashboardPage extends React.Component {
   }
 
   componentDidMount() {
-    const portfolio = this.props.stocks.map((stock) => stock.name);
+    const portfolio = this.props.stocks.map((stock) => stock.name );
     if (portfolio.length > 0) {
       const dataUpTo = this.props.stockData[0].lastUpdated;
       this.setState(() => ({
@@ -124,23 +138,22 @@ class DashboardPage extends React.Component {
           <DashboardNavbar />
           <div className='stocks'>
             <StockChart data={this.props.stocks} colours={colours} />
-            <div className='content-container'>
-              <div id='stocks__watching'>
+              <div className='stocks__watching' id='watching'>
                 {
                   this.props.stocks.length === 0 ? (
                     <div className='stocks__stock'>
                       <span>Enter a ticker to begin</span>
                     </div>
                   ) : (
-                    this.props.stocks.map((ticker, index) => {
-                      const stockData = this.props.stockData.filter((stock) => stock.name === ticker.name)[0];
+                    this.props.stocks.map((stock, index) => {
+                      const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name )[0];
                       if (stockData === undefined) {
                         return (<div></div>)
                       } else {
                         return <StockTicket
-                          key={ticker.name}
+                          key={stock.name}
                           removeStock={this.state.removeStock}
-                          ticker={ticker}
+                          ticker={stock.name}
                           colour={colours[index % colours.length]}
                           stockData={stockData}
                           deleteStock={this.deleteStock}
@@ -150,7 +163,7 @@ class DashboardPage extends React.Component {
                   )
                 }
               </div>
-              <div id='stocks__watching-add'>
+              <div className='stocks__watching-add'>
                 <div className='stocks__stock stocks__add-stock'>
                   <form onSubmit={this.onSubmit}>
                     <input
@@ -167,9 +180,8 @@ class DashboardPage extends React.Component {
                 </div>
               </div>
               <div className='stock__error'>{this.state.err}</div>
-            </div>
             <StockDetails />
-            <StockHistory />
+            <StockHistory stocks={this.props.stocks} stockData={this.props.stockData}/>
             <StockInformation />
             <Questions />
           </div>
@@ -185,7 +197,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  startAddStock: (name) => dispatch(startAddStock(name)),
+  startAddStock: (stock) => dispatch(startAddStock(stock)),
+  startEditStock: (id, watching) => dispatch(startEditStock(id, watching)),
   startAddStockData: (stock) => dispatch(startAddStockData(stock)),
   startRemoveStock: (ticker) => dispatch(startRemoveStock(ticker))
 });

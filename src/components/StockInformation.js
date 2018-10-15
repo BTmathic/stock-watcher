@@ -2,7 +2,7 @@ import React from 'react';
 
 export default () => (
   <div className='content-container'>
-    <div id='stock__information'>
+    <div className='stock__information' id='information'>
       <h2>Information about Stocks and Index Funds</h2>
       <div>List of sections on things to learn about stocks (each one links to another page)</div>
       <div>Stock basics (divide up?)</div>

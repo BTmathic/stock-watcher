@@ -9,6 +9,11 @@ export default (state = stocksReducerDefaultState, action) => {
       ];
     case 'REMOVE_STOCK':
       return state.filter(({ id }) => id !== action.id);
+    case 'EDIT_STOCK':
+      return [
+        ...state,
+        action.stock
+      ];
     case 'SET_STOCKS':
       return action.stocks;
     default:
