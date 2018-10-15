@@ -1,11 +1,12 @@
 .stocks {
+  margin-left: 23rem;
   padding-bottom: 5rem;
   h2 {
     color: $off-white;
     margin: 0;
     padding-top: 2rem;
   }
-  .stocks__watching {
+  #stocks__watching, #stocks__watching-add {
     color: $off-white;
     display: flex;
     flex-wrap: wrap;
@@ -74,7 +75,7 @@
   .stocks__chart {
     background: lighten(black, 10%);
     border-radius: 5px;
-    margin: 2rem 0;
+    margin: 75px 0 2rem;
     .chart--axis {
       color: $off-white;
     }

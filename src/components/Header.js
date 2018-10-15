@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { firebase } from '../firebase/firebase';
 import { startLogin, startLogout } from '../actions/auth';
 
 export const Header = ({ uid, startLogin, startLogout }) => (

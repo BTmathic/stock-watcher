@@ -1,6 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Questions from './Questions';
 import StockChart from './StockChart';
+import StockTicket from './StockTicket';
+import StockDetails from './StockDetails';
+import StockHistory from './StockHistory';
+import DashboardNavbar from './DashboardNavbar';
+import StockInformation from './StockInformation';
 import { startAddStockData } from '../actions/stockData';
 import { startAddStock, startRemoveStock } from '../actions/stocks';
 
@@ -66,6 +72,10 @@ class DashboardPage extends React.Component {
               const name = metaData['2. Symbol'].toUpperCase();
               const lastUpdated = metaData['3. Last Refreshed'].split(' ')[0];
               const values = json['Weekly Time Series'];
+              const latestOpenValue = values[lastUpdated]['1. open'];
+              const latestLowValue = values[lastUpdated]['3. low'];
+              const latestHighValue = values[lastUpdated]['2. high'];
+              const latestVolumeValue = values[lastUpdated]['5. volume'];
               const closingValues = Object.keys(values).map((date) => ({
                 date,
                 price: values[date]['4. close']
@@ -110,70 +120,58 @@ class DashboardPage extends React.Component {
     const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
     return (
       <div className='main-page'>
-        <div className='stocks'>
-          <div className='content-container dashboard--title'>
-            <h2>Stock Data</h2>
-          </div>
-          <StockChart data={this.props.stocks} colours={colours} />
-          <div className='content-container'>
-            <div className='stocks__watching'>
-              {
-                this.props.stocks.length === 0 ? (
-                  <div className='stocks__stock'>
-                    <span>Enter a ticker to begin</span>
-                  </div>
-                ) : (
+        <div className='content-container'>
+          <DashboardNavbar />
+          <div className='stocks'>
+            <StockChart data={this.props.stocks} colours={colours} />
+            <div className='content-container'>
+              <div id='stocks__watching'>
+                {
+                  this.props.stocks.length === 0 ? (
+                    <div className='stocks__stock'>
+                      <span>Enter a ticker to begin</span>
+                    </div>
+                  ) : (
                     this.props.stocks.map((ticker, index) => {
                       const stockData = this.props.stockData.filter((stock) => stock.name === ticker.name)[0];
                       if (stockData === undefined) {
                         return (<div></div>)
                       } else {
-                        return (
-                          <div
-                            className={this.state.removeStock === ticker.name ? 'stocks__stock stocks--removal-animation' : 'stocks__stock'}
-                            key={ticker.name}
-                            style={{ borderLeft: 0.7 + `rem solid ${colours[index % colours.length]}` }}>
-                            <div className='stocks__stock-ticker'>{ticker.name}</div>
-                            {
-                              /*stockData.lastUpdated === '' ? <div></div> :*/
-                              <div>
-                                <div className='stocks__stock-info'>Last Updated: {stockData.lastUpdated}</div>
-                                <div className='stocks__delete-stock' onClick={(e) => this.deleteStock(ticker.name)}>x</div>
-                              </div>
-                            }
-                          </div>
-                        );
+                        return <StockTicket
+                          key={ticker.name}
+                          removeStock={this.state.removeStock}
+                          ticker={ticker}
+                          colour={colours[index % colours.length]}
+                          stockData={stockData}
+                          deleteStock={this.deleteStock}
+                        />;
                       }
                     })
                   )
-              }
-            </div>
-            <div className='stocks__watching'>
-              <div className='stocks__stock stocks__add-stock'>
-                <form onSubmit={this.onSubmit}>
-                  <input
-                    name='newStock'
-                    className='stocks__add-stock-ticker'
-                    type='text'
-                    placeholder='Stock tag'
-                    value={this.state.newStock}
-                    onChange={this.handleInput}
-                    required
-                  />
-                  <input type='submit' className='stocks__submit-stock-ticker' />
-                </form>
+                }
               </div>
+              <div id='stocks__watching-add'>
+                <div className='stocks__stock stocks__add-stock'>
+                  <form onSubmit={this.onSubmit}>
+                    <input
+                      name='newStock'
+                      className='stocks__add-stock-ticker'
+                      type='text'
+                      placeholder='Stock tag'
+                      value={this.state.newStock}
+                      onChange={this.handleInput}
+                      required
+                    />
+                    <input type='submit' className='stocks__submit-stock-ticker' />
+                  </form>
+                </div>
+              </div>
+              <div className='stock__error'>{this.state.err}</div>
             </div>
-            <div className='stock__error'>{this.state.err}</div>
-          </div>
-          <div className='content-container'>
-            <h2>Stock Watching History</h2>
-          </div>
-          <div>
-            {/* Add a section to follow previously searched stocks
-                Also allow these to be deleted if the user wishes
-                These can have a 'likes' or 'watching' count
-            */}
+            <StockDetails />
+            <StockHistory />
+            <StockInformation />
+            <Questions />
           </div>
         </div>
       </div>
