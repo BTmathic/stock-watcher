@@ -1,18 +1,24 @@
 import React from 'react';
 import ReactFauxDOM from 'react-faux-dom';
 import * as d3 from 'd3';
-import { connect } from 'react-redux';
 
-class StockChart extends React.Component {
+export default class StockChart extends React.Component {
   // need to force a state change (rerender) for the tooltip to display with CSS position: absolute
   componentDidMount() {
-    this.setState(() => ({ rerender: true }));
+    this.setState(() => ({}));
   }
 
   render() {
     const div = new ReactFauxDOM.Element('div');
-    const stockTickers = this.props.data;
-    const rawData = stockTickers.map((ticker) => this.props.stockData.filter((stock) => stock.name === ticker.name)[0]);
+    const rawData = [];
+    for (let i=0; i < this.props.data.length; i++) {
+      const ticker = this.props.data[i].name;
+      for (let j=0; j < this.props.stockData.length; j++) {
+        if (this.props.stockData[j].name === ticker) {
+          rawData.push(this.props.stockData[j]);
+        }
+      }
+    }
     const stockMax = d3.max(rawData.map((stock) => d3.max(stock.closingValues.map((d) => parseInt(d.price)))));
     const smallestDataSetSize = d3.min(rawData.map((stock) => stock.closingValues.length));
     const restrictingDataSet = rawData.filter((stock) => stock.closingValues.length === smallestDataSetSize)[0];
@@ -150,9 +156,3 @@ class StockChart extends React.Component {
     return div.toReact();
   }
 }
-
-const mapStateToProps = (state) => ({
-  stockData: state.stockData
-});
-
-export default connect(mapStateToProps)(StockChart);

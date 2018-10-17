@@ -13,6 +13,7 @@ import { startAddStock, startEditStock, startRemoveStock } from '../actions/stoc
 class DashboardPage extends React.Component {
   state = {
     dataUpTo: '',
+    detailsStock: '',
     err: '',
     hover: '',
     newStock: '',
@@ -20,12 +21,12 @@ class DashboardPage extends React.Component {
     removeStock: ''
   }
 
-  deleteStock = (ticker, watching) => {
+  deleteStock = (ticker, history) => {
     this.setState(() => ({ removeStock: ticker }));
-    if (watching) {
+    if (history) {
       this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
       const oldPortfolio = this.state.portfolio;
-      const portfolio = oldPortfolio.filter((stock) => stock !== ticker);
+      const portfolio = oldPortfolio.filter((stock) => stock.name !== ticker);
       this.setState(() => ({
         err: '',
         portfolio,
@@ -36,8 +37,13 @@ class DashboardPage extends React.Component {
       }
     } else {
       this.props.startEditStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
-      console.log('dur');
-      this.setState(() => ({ err: '' }));
+      const portfolio = this.state.portfolio;
+      for (let i=0; i < portfolio.length; i++) {
+        if (portfolio[i].name === ticker) {
+          portfolio[i].watching = false;
+        }
+      }
+      this.setState(() => ({ portfolio }));
     }
   }
 
@@ -49,7 +55,7 @@ class DashboardPage extends React.Component {
   loadStockToDisplay = (newStock) => {
     this.props.startAddStock({name: newStock.name, watching: true});
     const portfolio = this.state.portfolio;
-    portfolio.push(newStock.name);
+    portfolio.push(newStock);
     this.setState(() => ({
       err: '',
       newStock: '',
@@ -67,8 +73,8 @@ class DashboardPage extends React.Component {
     // As we are using a free API with a limit of 5 calls/minute, do not fetch data
     // if user is trying to add a stock already in their portfolio. Though we allow
     // refetching if user is updating old stock data
-    const portfolioStocks = this.state.portfolio;
-    if (portfolioStocks.filter((stock) => stock === this.state.newStock.toUpperCase()).length === 0) {
+    const portfolio = this.state.portfolio;
+    if (portfolio.filter((stock) => stock.name === this.state.newStock.toUpperCase()).length === 0) {
       const stockData = this.props.stockData.filter((stock) => stock.name === this.state.newStock.toUpperCase());
       if (stockData.length === 0) {
         fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.state.newStock}&apikey=${process.env.API_KEY}`)
@@ -121,20 +127,31 @@ class DashboardPage extends React.Component {
         this.loadStockToDisplay(stockData[0]);
       }
     } else {
-      if (this.props.stocks.filter((stock) => !stock.watching && stock.name === this.state.newStock.toUpperCase()).length > 0) {
+      if (this.state.portfolio.filter((stock) => !stock.watching && stock.name === this.state.newStock.toUpperCase()).length > 0) {
         this.props.startEditStock(this.props.stocks.filter((stock) => stock.name === this.state.newStock.toUpperCase())[0].id, true);
+        for (let i=0; i < portfolio.length; i++) {
+          if (portfolio[i].name === this.state.newStock.toUpperCase()) {
+            portfolio[i].watching = true;
+          }
+        }
+        this.setState(() => ({
+          err: '',
+          newStock: '',
+          portfolio
+        }));
       } else {
         this.setState(() => ({ err: 'Stock already added' }));
       }
     }
   }
 
-  componentDidMount() {
-    const portfolio = this.props.stocks.map((stock) => stock.name );
+  componentWillMount() {
+    const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
     if (portfolio.length > 0) {
       const dataUpTo = this.props.stockData[0].lastUpdated;
       this.setState(() => ({
         dataUpTo,
+        detailsStock: portfolio[0].name,
         portfolio
       }));
     }
@@ -147,15 +164,18 @@ class DashboardPage extends React.Component {
         <div className='content-container'>
           <DashboardNavbar />
           <div className='stocks'>
-            <StockChart data={this.props.stocks.filter((stock) => stock.watching)} colours={colours} />
+            <StockChart
+              data={this.state.portfolio.filter((stock) => stock.watching)}
+              stockData={this.props.stockData}
+              colours={colours} />
               <div className='stocks__watching' id='watching'>
                 {
-                  this.props.stocks.length === 0 ? (
+                  this.state.portfolio.length === 0 ? (
                     <div className='stocks__stock'>
                       <span>Enter a ticker to begin</span>
                     </div>
                   ) : (
-                    this.props.stocks.map((stock, index) => {
+                    this.state.portfolio.map((stock, index) => {
                       if (stock.watching) {
                         const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name && stock.watching)[0];
                         if (stockData === undefined) {
@@ -168,7 +188,7 @@ class DashboardPage extends React.Component {
                             colour={colours[index % colours.length]}
                             stockData={stockData}
                             deleteStock={this.deleteStock}
-                            watching={false}
+                            history={false}
                           />;
                         }
                       }
@@ -193,10 +213,14 @@ class DashboardPage extends React.Component {
                 </div>
               </div>
               <div className='stock__error'>{this.state.err}</div>
-            <StockDetails data={[this.props.stocks[0]]} colour={colours[0]} />
+            <StockDetails
+              data={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
+              colour={colours[0]}
+              stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+            />
             <StockHistory
               deleteStock={this.deleteStock}
-              stocks={this.props.stocks}
+              stocks={this.state.portfolio}
               stockData={this.props.stockData}
             />
             <StockInformation />

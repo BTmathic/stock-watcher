@@ -4,7 +4,11 @@ import StockChart from './StockChart'
 export default (props) => (
   <div className='stock__details' id='details'>
     <h2>Stock Details ({props.data[0].name})</h2>
-    <StockChart data={props.data} colours={[props.colour]} />
+    <StockChart
+      data={props.data}
+      stockData={props.stockData}
+      colours={[props.colour]}
+    />
     {/*
     <div>Chart single stock</div>
     <div>Title (stock data for the latest full day)</div>
