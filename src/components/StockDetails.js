@@ -1,18 +1,19 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import StockChart from './StockChart'
 
-export default () => (
-  <div className='content-container'>
-    <div className='stock__details' id='details'>
-      <h2>Stock Details</h2>
-      <div>Chart single stock</div>
-      <div>Title (stock data for the latest full day)</div>
-      <div>Stock open for the day</div>
-      <div>Stock high for the day</div>
-      <div>Stock low for the day</div>
-      <div>Stock close for the day</div>
-      <div>Stock volume for the day</div>
-      <div>Form/button to select which stock to view, only allow one</div>
-    </div>
+export default (props) => (
+  <div className='stock__details' id='details'>
+    <h2>Stock Details ({props.data[0].name})</h2>
+    <StockChart data={props.data} colours={[props.colour]} />
+    {/*
+    <div>Chart single stock</div>
+    <div>Title (stock data for the latest full day)</div>
+    <div>Stock open for the day</div>
+    <div>Stock high for the day</div>
+    <div>Stock low for the day</div>
+    <div>Stock close for the day</div>
+    <div>Stock volume for the day</div>
+    <div>Form/button to select which stock to view, only allow one</div>
+    */}
   </div>
-  );
+);

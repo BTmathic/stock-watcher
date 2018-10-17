@@ -67,10 +67,11 @@ const updateStocks = () => {
       const stockId = childSnapshot.key;
       const stock = childSnapshot.val();
       const date = new Date(stock.lastUpdated);
-      if (date.getUTCDate() !== currentDate.getDate()) {
+      //if (date.getUTCDate() !== currentDate.getDate()) {
+      // testing just doing it at regular intervals instead
         snapshotIndex++;
         updateStock(stock, stockId, snapshotIndex);
-      }
+      //}
     });
   });
 }

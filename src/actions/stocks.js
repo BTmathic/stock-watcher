@@ -36,19 +36,20 @@ export const startRemoveStock = (id) => {
 };
 
 // Toggle stock visibility in user chart
-export const editStock = (id = '', watching) => ({
+export const editStock = (stock = {}) => ({
   type: 'EDIT_STOCK',
-  id,
-  watching
+  stock
 });
 
-export const startEditStock = (id = '', watching = false) => {
+export const startEditStock = (id = '', watching) => {
   return (dispatch, getState) => {
     const uid = getState().auth.uid;
     return database.ref(`users/${uid}/stocks/${id}`).update({
-      ...watching
+      watching
     }).then(() => {
-      dispatch(editStock(id, watching));
+      const stock = getState().stocks.filter((stock) => stock.id === id)[0];
+      stock.watching = watching;
+      dispatch(editStock(stock));
     });
   };
 };

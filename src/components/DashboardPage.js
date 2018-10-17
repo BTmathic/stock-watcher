@@ -20,18 +20,24 @@ class DashboardPage extends React.Component {
     removeStock: ''
   }
 
-  deleteStock = (ticker) => {
+  deleteStock = (ticker, watching) => {
     this.setState(() => ({ removeStock: ticker }));
-    this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
-    const oldPortfolio = this.state.portfolio;
-    const portfolio = oldPortfolio.filter((stock) => stock !== ticker);
-    this.setState(() => ({
-      err: '',
-      portfolio,
-      removeStock: ''
-    }));
-    if (portfolio.length === 0) {
-      this.setState(() => ({ dataUpTo: '' }));
+    if (watching) {
+      this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
+      const oldPortfolio = this.state.portfolio;
+      const portfolio = oldPortfolio.filter((stock) => stock !== ticker);
+      this.setState(() => ({
+        err: '',
+        portfolio,
+        removeStock: ''
+      }));
+      if (portfolio.length === 0) {
+        this.setState(() => ({ dataUpTo: '' }));
+      }
+    } else {
+      this.props.startEditStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
+      console.log('dur');
+      this.setState(() => ({ err: '' }));
     }
   }
 
@@ -61,7 +67,7 @@ class DashboardPage extends React.Component {
     // As we are using a free API with a limit of 5 calls/minute, do not fetch data
     // if user is trying to add a stock already in their portfolio. Though we allow
     // refetching if user is updating old stock data
-    const portfolioStocks = this.state.portfolio;//.concat(this.props.stocks);
+    const portfolioStocks = this.state.portfolio;
     if (portfolioStocks.filter((stock) => stock === this.state.newStock.toUpperCase()).length === 0) {
       const stockData = this.props.stockData.filter((stock) => stock.name === this.state.newStock.toUpperCase());
       if (stockData.length === 0) {
@@ -115,7 +121,11 @@ class DashboardPage extends React.Component {
         this.loadStockToDisplay(stockData[0]);
       }
     } else {
-      this.setState(() => ({ err: 'Stock already added' }));
+      if (this.props.stocks.filter((stock) => !stock.watching && stock.name === this.state.newStock.toUpperCase()).length > 0) {
+        this.props.startEditStock(this.props.stocks.filter((stock) => stock.name === this.state.newStock.toUpperCase())[0].id, true);
+      } else {
+        this.setState(() => ({ err: 'Stock already added' }));
+      }
     }
   }
 
@@ -131,13 +141,13 @@ class DashboardPage extends React.Component {
   }
 
   render() {
-    const colours = ['steelblue', 'yellow', 'red', 'orange', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
+    const colours = ['orange', 'yellow', 'red', 'steelblue', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
     return (
       <div className='main-page'>
         <div className='content-container'>
           <DashboardNavbar />
           <div className='stocks'>
-            <StockChart data={this.props.stocks} colours={colours} />
+            <StockChart data={this.props.stocks.filter((stock) => stock.watching)} colours={colours} />
               <div className='stocks__watching' id='watching'>
                 {
                   this.props.stocks.length === 0 ? (
@@ -146,18 +156,21 @@ class DashboardPage extends React.Component {
                     </div>
                   ) : (
                     this.props.stocks.map((stock, index) => {
-                      const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name )[0];
-                      if (stockData === undefined) {
-                        return (<div></div>)
-                      } else {
-                        return <StockTicket
-                          key={stock.name}
-                          removeStock={this.state.removeStock}
-                          ticker={stock.name}
-                          colour={colours[index % colours.length]}
-                          stockData={stockData}
-                          deleteStock={this.deleteStock}
-                        />;
+                      if (stock.watching) {
+                        const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name && stock.watching)[0];
+                        if (stockData === undefined) {
+                          return (<div></div>);
+                        } else {
+                          return <StockTicket
+                            key={stock.name}
+                            removeStock={this.state.removeStock}
+                            ticker={stock.name}
+                            colour={colours[index % colours.length]}
+                            stockData={stockData}
+                            deleteStock={this.deleteStock}
+                            watching={false}
+                          />;
+                        }
                       }
                     })
                   )
@@ -180,8 +193,12 @@ class DashboardPage extends React.Component {
                 </div>
               </div>
               <div className='stock__error'>{this.state.err}</div>
-            <StockDetails />
-            <StockHistory stocks={this.props.stocks} stockData={this.props.stockData}/>
+            <StockDetails data={[this.props.stocks[0]]} colour={colours[0]} />
+            <StockHistory
+              deleteStock={this.deleteStock}
+              stocks={this.props.stocks}
+              stockData={this.props.stockData}
+            />
             <StockInformation />
             <Questions />
           </div>
@@ -200,7 +217,7 @@ const mapDispatchToProps = (dispatch) => ({
   startAddStock: (stock) => dispatch(startAddStock(stock)),
   startEditStock: (id, watching) => dispatch(startEditStock(id, watching)),
   startAddStockData: (stock) => dispatch(startAddStockData(stock)),
-  startRemoveStock: (ticker) => dispatch(startRemoveStock(ticker))
+  startRemoveStock: (stock) => dispatch(startRemoveStock(stock))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardPage);

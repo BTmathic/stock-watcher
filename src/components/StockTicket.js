@@ -26,13 +26,15 @@ export default class StockTicker extends React.Component {
         <div>
           <div className='stocks__stock-info'>
             <p>Latest value: {'$' + this.props.stockData.closingValues[0].price.slice(0, -2)}</p>
-            <p>Previous close: {'$' + this.props.stockData.closingValues[1].price.slice(0, -2)}</p>
-            <p>Open: {'$' + this.props.stockData.recentValues[0].open.slice(0, -2)}</p>
-            <p>Low: {'$' + this.props.stockData.recentValues[0].low.slice(0, -2)}</p>
-            <p>High: {'$' + this.props.stockData.recentValues[0].high.slice(0, -2)}</p>
+            <div className={this.props.watching ? '' : 'hidden'}>
+              <p>Previous close: {'$' + this.props.stockData.closingValues[1].price.slice(0, -2)}</p>
+              <p>Open: {'$' + this.props.stockData.recentValues[0].open.slice(0, -2)}</p>
+              <p>Low: {'$' + this.props.stockData.recentValues[0].low.slice(0, -2)}</p>
+              <p>High: {'$' + this.props.stockData.recentValues[0].high.slice(0, -2)}</p>
+            </div>
             <p>Volume: {this.props.stockData.recentValues[0].volume}</p>
           </div>
-          <div className='stocks__delete-stock' onClick={(e) => this.props.deleteStock(this.props.ticker)}>x</div>
+          <div className='stocks__delete-stock' onClick={() => this.props.deleteStock(this.props.ticker, this.props.watching)}>x</div>
         </div>
       </div>
     );
