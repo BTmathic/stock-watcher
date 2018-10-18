@@ -5,7 +5,7 @@ export default (state = stockDataReducerDefaultState, action) => {
     case 'ADD_STOCK_DATA':
       return [
         ...state,
-        action.stock
+        action.stockData
       ];
     case 'SET_STOCK_DATA':
       return action.stockData;

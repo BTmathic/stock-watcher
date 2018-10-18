@@ -6,10 +6,10 @@ export const addStockData = (stockData) => ({
   stockData
 });
 
-export const startAddStockData = ({ name, lastUpdated, closingValues} = {}) => {
+export const startAddStockData = ({ name, lastUpdated, closingValues, recentValues} = {}) => {
   return (dispatch) => {
-    const stockData = { name, lastUpdated, closingValues };
-
+    const stockData = { name, lastUpdated, closingValues, recentValues };
+    
     return database.ref('stocks').push(stockData).then((ref) => {
       dispatch(addStockData({
         id: ref.key,

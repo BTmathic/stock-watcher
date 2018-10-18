@@ -1,9 +1,7 @@
 import React from 'react';
 import StockTicket from './StockTicket';
-import { connect } from 'react-redux';
-import { startRemoveStock } from '../actions/stocks';
 
-const StockHistory = (props) => (
+export default (props) => (
   <div className='stock__viewing-history' id='viewing-history'>
     <h2>Stock Watching History</h2>
     <div className='stocks__watching'>
@@ -32,9 +30,3 @@ const StockHistory = (props) => (
     </div>
   </div>
 );
-
-const mapDispatchToProps = (dispatch) => ({
-  startRemoveStock: (ticker) => dispatch(startRemoveStock(ticker))
-});
-
-export default connect(undefined, mapDispatchToProps)(StockHistory);

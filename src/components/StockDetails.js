@@ -8,6 +8,7 @@ export default (props) => (
       data={props.data}
       stockData={props.stockData}
       colours={[props.colour]}
+      navbarWidth={props.navbarWidth}
     />
     {/*
     <div>Chart single stock</div>

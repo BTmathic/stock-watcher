@@ -27,7 +27,7 @@ export default class StockChart extends React.Component {
     const parseTime = d3.timeParse('%Y-%m-%d');
     const bisectDate = d3.bisector((d) => d.date).left;
     const margin = {top: 20, right: 40, bottom: 70, left: 40}
-    const width = Math.min(1000-margin.left-margin.right, window.innerWidth - 2*(margin.left + margin.right)); // one margin for the chart padding, one for the margin outside the chart
+    const width = Math.min(1000 - margin.left - margin.right, window.innerWidth - this.props.navbarWidth - 1.5*(margin.left + margin.right));
     const height = Math.max(320, window.innerHeight - margin.top - margin.bottom - 75*2); // -75 for header and for bottom stock info, minimum for landscape view on mobile devices
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
@@ -35,7 +35,7 @@ export default class StockChart extends React.Component {
     const yAxisTicks = 5;
     const xAxis = d3.axisBottom(x).ticks(xAxisTicks).tickFormat(d3.timeFormat('%b %d, %Y'));
     const yAxis = d3.axisLeft(y).ticks(yAxisTicks);
-
+    
     // Style the div for the chart before working on building it with D3
     div.style.setProperty('display', 'flex');
     div.style.setProperty('justify-content', 'space-around');

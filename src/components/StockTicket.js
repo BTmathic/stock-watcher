@@ -19,6 +19,7 @@ export default class StockTicker extends React.Component {
         style={{ borderLeft: 0.7 + `rem solid ${this.props.colour}` }}>
         <div className='stocks__stock-ticker'>
           {this.props.ticker}
+          {/*console.log(this.props.stockData)*/}
           <span style={{ color: this.handleValueChange(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close) >= 0 ? 'green' : 'red' }}>
             {' ' + this.handleValueChange(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close) + 
             ' (' + (this.handleValueChangePercent(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close)) + '%)'}</span>

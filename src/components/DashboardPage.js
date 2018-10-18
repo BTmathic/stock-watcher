@@ -16,6 +16,7 @@ class DashboardPage extends React.Component {
     detailsStock: '',
     err: '',
     hover: '',
+    navbarWidth: 0,
     newStock: '',
     portfolio: [],
     removeStock: ''
@@ -53,9 +54,10 @@ class DashboardPage extends React.Component {
   }
 
   loadStockToDisplay = (newStock) => {
-    this.props.startAddStock({name: newStock.name, watching: true});
+    const portfolioStock = { name: newStock.name, watching: true };
+    this.props.startAddStock(portfolioStock);
     const portfolio = this.state.portfolio;
-    portfolio.push(newStock);
+    portfolio.push(portfolioStock);
     this.setState(() => ({
       err: '',
       newStock: '',
@@ -152,22 +154,26 @@ class DashboardPage extends React.Component {
       this.setState(() => ({
         dataUpTo,
         detailsStock: portfolio[0].name,
-        portfolio
+        portfolio,
+        stockData: this.props.stockData
       }));
     }
   }
 
   render() {
     const colours = ['orange', 'yellow', 'red', 'steelblue', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
+    let colourIndex = -1;
     return (
       <div className='main-page'>
         <div className='content-container'>
-          <DashboardNavbar />
+          <DashboardNavbar setWidth={(width) => this.setState(() => ({ navbarWidth: width }))} />
           <div className='stocks'>
             <StockChart
               data={this.state.portfolio.filter((stock) => stock.watching)}
               stockData={this.props.stockData}
-              colours={colours} />
+              colours={colours}
+              navbarWidth={this.state.navbarWidth}
+            />
               <div className='stocks__watching' id='watching'>
                 {
                   this.state.portfolio.length === 0 ? (
@@ -175,9 +181,10 @@ class DashboardPage extends React.Component {
                       <span>Enter a ticker to begin</span>
                     </div>
                   ) : (
-                    this.state.portfolio.map((stock, index) => {
+                    this.state.portfolio.map((stock) => {
                       if (stock.watching) {
-                        const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name && stock.watching)[0];
+                        colourIndex++;
+                        const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name)[0];
                         if (stockData === undefined) {
                           return (<div></div>);
                         } else {
@@ -185,7 +192,7 @@ class DashboardPage extends React.Component {
                             key={stock.name}
                             removeStock={this.state.removeStock}
                             ticker={stock.name}
-                            colour={colours[index % colours.length]}
+                            colour={colours[colourIndex % colours.length]}
                             stockData={stockData}
                             deleteStock={this.deleteStock}
                             history={false}
@@ -217,6 +224,7 @@ class DashboardPage extends React.Component {
               data={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
               colour={colours[0]}
               stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+              navbarWidth={this.state.navbarWidth}
             />
             <StockHistory
               deleteStock={this.deleteStock}
