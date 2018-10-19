@@ -2,7 +2,7 @@ import React from 'react';
 
 export default class DashboardNavbar extends React.Component {
   componentDidMount() {
-    this.props.setWidth(this.navbar.offsetWidth);
+    this.props.setPosition(this.navbar.offsetLeft, this.navbar.offsetWidth);
   }
 
   render() {

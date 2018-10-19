@@ -3,11 +3,6 @@ import ReactFauxDOM from 'react-faux-dom';
 import * as d3 from 'd3';
 
 export default class StockChart extends React.Component {
-  // need to force a state change (rerender) for the tooltip to display with CSS position: absolute
-  componentDidMount() {
-    this.setState(() => ({}));
-  }
-
   render() {
     const div = new ReactFauxDOM.Element('div');
     const rawData = [];
@@ -26,8 +21,8 @@ export default class StockChart extends React.Component {
     const colours = this.props.colours;
     const parseTime = d3.timeParse('%Y-%m-%d');
     const bisectDate = d3.bisector((d) => d.date).left;
-    const margin = {top: 20, right: 40, bottom: 70, left: 40}
-    const width = Math.min(1000 - margin.left - margin.right, window.innerWidth - this.props.navbarWidth - 1.5*(margin.left + margin.right));
+    const margin = {top: 20, right: 40, bottom: 80, left: 40}
+    const width = Math.min(768 - margin.left - margin.right, window.innerWidth - this.props.navbarWidth - 1.5*(margin.left + margin.right));
     const height = Math.max(320, window.innerHeight - margin.top - margin.bottom - 75*2); // -75 for header and for bottom stock info, minimum for landscape view on mobile devices
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
@@ -35,7 +30,7 @@ export default class StockChart extends React.Component {
     const yAxisTicks = 5;
     const xAxis = d3.axisBottom(x).ticks(xAxisTicks).tickFormat(d3.timeFormat('%b %d, %Y'));
     const yAxis = d3.axisLeft(y).ticks(yAxisTicks);
-    
+
     // Style the div for the chart before working on building it with D3
     div.style.setProperty('display', 'flex');
     div.style.setProperty('justify-content', 'space-around');
@@ -120,19 +115,20 @@ export default class StockChart extends React.Component {
       tooltip.enter()
         .append('div')
         .attr('class', 'tooltip')
-        .style('opacity', 0);
+        .style('display', 'none');
 
       svg.append('rect')
+        .attr('id', 'tooltip-overlay')
         .attr('width', width)
         .attr('height', height)
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
-        .on('mouseover', () => tooltip.style('opacity', '1'))
-        .on('mouseout', () => tooltip.style('opacity', '0'))
-        .on('mousemove', mousemove);
+        .on('mouseover', () => tooltip.style('display', 'block'))
+        .on('mouseout', () => tooltip.style('display', 'none'))
+        .on('mousemove', mousemove.bind(this));
 
       function mousemove() {
-        const xMarginOffset = 73; // the data on the x-axis starts at x-position 73px
+        const xMarginOffset = this.props.navbarLeft + this.props.navbarWidth + margin.left;
         const x0 = x.invert(d3.event.clientX - xMarginOffset);
         const i = bisectDate(data.stocks, x0, 1);
         const d0 = data.stocks[i - 1];

@@ -95,6 +95,21 @@
     h2 {
       margin-bottom: -65px;
     }
+    h3 {
+      margin-bottom: 0.5rem;
+      margin-top: 0;
+    }
+    .stock__details-container {
+      background: #666;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      margin: 2rem;
+      .stock__detail {
+        margin: 0.5rem 1rem;
+        padding: 1rem 2rem;
+      }
+    }
   }
   .stock__information p {
     background: grey;

@@ -16,6 +16,7 @@ class DashboardPage extends React.Component {
     detailsStock: '',
     err: '',
     hover: '',
+    navbarLeft: 0,
     navbarWidth: 0,
     newStock: '',
     portfolio: [],
@@ -166,12 +167,13 @@ class DashboardPage extends React.Component {
     return (
       <div className='main-page'>
         <div className='content-container'>
-          <DashboardNavbar setWidth={(width) => this.setState(() => ({ navbarWidth: width }))} />
+          <DashboardNavbar setPosition={(left, width) => this.setState(() => ({ navbarLeft: left, navbarWidth: width }))} />
           <div className='stocks'>
             <StockChart
               data={this.state.portfolio.filter((stock) => stock.watching)}
               stockData={this.props.stockData}
               colours={colours}
+              navbarLeft={this.state.navbarLeft}
               navbarWidth={this.state.navbarWidth}
             />
               <div className='stocks__watching' id='watching'>
@@ -224,6 +226,7 @@ class DashboardPage extends React.Component {
               data={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
               colour={colours[0]}
               stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+              navbarLeft={this.state.navbarLeft}
               navbarWidth={this.state.navbarWidth}
             />
             <StockHistory
