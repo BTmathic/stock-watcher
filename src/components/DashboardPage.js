@@ -21,7 +21,7 @@ class DashboardPage extends React.Component {
     newStock: '',
     portfolio: [],
     removeStock: ''
-  }
+  };
 
   deleteStock = (ticker, history) => {
     this.setState(() => ({ removeStock: ticker }));
@@ -47,12 +47,12 @@ class DashboardPage extends React.Component {
       }
       this.setState(() => ({ portfolio }));
     }
-  }
+  };
 
   handleInput = (e) => {
     const newStock = e.target.value;
     this.setState(() => ({ newStock }));
-  }
+  };
 
   loadStockToDisplay = (newStock) => {
     const portfolioStock = { name: newStock.name, watching: true };
@@ -64,7 +64,7 @@ class DashboardPage extends React.Component {
       newStock: '',
       portfolio
     }));
-  }
+  };
 
   onSubmit = (e) => {
     e.preventDefault();
@@ -146,7 +146,7 @@ class DashboardPage extends React.Component {
         this.setState(() => ({ err: 'Stock already added' }));
       }
     }
-  }
+  };
 
   componentWillMount() {
     const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
@@ -158,7 +158,7 @@ class DashboardPage extends React.Component {
         stockData: this.props.stockData
       }));
     }
-  }
+  };
 
   render() {
     const colours = ['orange', 'yellow', 'red', 'steelblue', 'green', 'pink', 'blue', 'black', 'lightblue', 'lightgrey', 'lightgreen'];
@@ -240,7 +240,7 @@ class DashboardPage extends React.Component {
         </div>
       </div>
     );
-  }
+  };
 };
 
 const mapStateToProps = (state) => ({

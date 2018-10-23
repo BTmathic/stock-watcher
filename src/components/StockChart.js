@@ -3,6 +3,16 @@ import ReactFauxDOM from 'react-faux-dom';
 import * as d3 from 'd3';
 
 export default class StockChart extends React.Component {
+  resize = () => { this.forceUpdate() };
+
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+  };
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  };
+
   render() {
     const div = new ReactFauxDOM.Element('div');
     const rawData = [];
