@@ -3,7 +3,7 @@ import React from 'react';
 export default class StockTicker extends React.Component {
   handleClick = () => {
     if (this.props.history) {
-      this.props.handleTicketClick(this.props.ticker)
+      this.props.handleTicketClick(this.props.ticker);
     }
   }
 
@@ -44,7 +44,7 @@ export default class StockTicker extends React.Component {
             </div>
             <p>Volume: {this.props.stockData.recentValues[0].volume}</p>
           </div>
-          <div className='stocks__delete-stock' onClick={() => this.props.deleteStock(this.props.ticker, this.props.history)}>x</div>
+          <div className='stocks__delete-stock' onClick={(e) => this.props.deleteStock(e, this.props.ticker, this.props.history)}>x</div>
         </div>
       </div>
     );

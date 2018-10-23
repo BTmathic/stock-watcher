@@ -3,7 +3,6 @@ import React from 'react';
 export default class DashboardNavbar extends React.Component {
   resize = () => {
     this.props.setPosition(this.navbar.offsetLeft, this.navbar.offsetWidth);
-    this.forceUpdate();
   }
   
   componentDidMount() {
