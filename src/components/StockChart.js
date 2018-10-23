@@ -9,6 +9,8 @@ export default class StockChart extends React.Component {
     for (let i=0; i < this.props.data.length; i++) {
       const ticker = this.props.data[i].name;
       for (let j=0; j < this.props.stockData.length; j++) {
+        if (this.props.data.length === 1) {
+        }
         if (this.props.stockData[j].name === ticker) {
           rawData.push(this.props.stockData[j]);
         }

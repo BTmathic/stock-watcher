@@ -22,6 +22,7 @@ export default (props) => (
                   ticker={stock.name}
                   stockData={stockData}
                   deleteStock={props.deleteStock}
+                  handleTicketClick={props.handleTicketClick}
                 />;
               }
             })

@@ -13,7 +13,7 @@ import { startAddStock, startEditStock, startRemoveStock } from '../actions/stoc
 class DashboardPage extends React.Component {
   state = {
     dataUpTo: '',
-    detailsStock: '',
+    detailsStock: this.props.stocks[0].name,
     err: '',
     hover: '',
     navbarLeft: 0,
@@ -154,7 +154,6 @@ class DashboardPage extends React.Component {
       const dataUpTo = this.props.stockData[0].lastUpdated;
       this.setState(() => ({
         dataUpTo,
-        detailsStock: portfolio[0].name,
         portfolio,
         stockData: this.props.stockData
       }));
@@ -221,18 +220,19 @@ class DashboardPage extends React.Component {
                   </form>
                 </div>
               </div>
-              <div className='stock__error'>{this.state.err}</div>
+            <div className='stock__error'>{this.state.err}</div>
             <StockDetails
-              data={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
               colour={colours[0]}
-              stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+              stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
               navbarLeft={this.state.navbarLeft}
               navbarWidth={this.state.navbarWidth}
+              stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
             />
             <StockHistory
               deleteStock={this.deleteStock}
               stocks={this.state.portfolio}
               stockData={this.props.stockData}
+              handleTicketClick={(detailsStock) => this.setState(() => ({ detailsStock }))}
             />
             <StockInformation />
             <Questions />

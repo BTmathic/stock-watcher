@@ -1,6 +1,12 @@
 import React from 'react';
 
 export default class StockTicker extends React.Component {
+  handleClick = () => {
+    if (this.props.history) {
+      this.props.handleTicketClick(this.props.ticker)
+    }
+  }
+
   handleValueChange = (current, previousClose) => {
     const change = Math.round(100 * (current - previousClose)) / 100;
     return (change > 0 ? '+' : '') + change;
@@ -12,17 +18,20 @@ export default class StockTicker extends React.Component {
   }
   
   render() {
+    const currentClose = this.props.stockData.recentValues[0].close;
+    const prevClose = this.props.stockData.recentValues[1].close;
     return (
       <div
-        className={this.props.removeStock === this.props.ticker ? 'stocks__stock stocks--removal-animation' : 'stocks__stock'}
+        className={[this.props.removeStock === this.props.ticker ? 'stocks__stock stocks--removal-animation' : 'stocks__stock',
+          this.props.history ? 'stocks__stock-hover' : ''].join(' ')}
         key={this.props.ticker}
+        onClick={this.handleClick}
         style={{ borderLeft: 0.7 + `rem solid ${this.props.colour}` }}>
         <div className='stocks__stock-ticker'>
           {this.props.ticker}
-          {/*console.log(this.props.stockData)*/}
-          <span style={{ color: this.handleValueChange(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close) >= 0 ? 'green' : 'red' }}>
-            {' ' + this.handleValueChange(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close) + 
-            ' (' + (this.handleValueChangePercent(this.props.stockData.recentValues[1].close, this.props.stockData.recentValues[0].close)) + '%)'}</span>
+          <span style={{ color: this.handleValueChange(currentClose, prevClose) >= 0 ? 'green' : 'red' }}>
+            {' ' + this.handleValueChange(currentClose, prevClose) + 
+            ' (' + (this.handleValueChangePercent(currentClose, prevClose)) + '%)'}</span>
         </div>
         <div>
           <div className='stocks__stock-info'>

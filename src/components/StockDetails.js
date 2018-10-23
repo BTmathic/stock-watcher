@@ -1,36 +1,35 @@
 import React from 'react';
-import StockChart from './StockChart'
+import StockChart from './StockChart';
+import StockDetail from './StockDetail';
 
-export default (props) => (
-  <div className='stock__details' id='details'>
-    <h2>Stock Details ({props.data[0].name})</h2>
-    <StockChart
-      data={props.data}
-      stockData={props.stockData}
-      colours={[props.colour]}
-      navbarLeft={props.navbarLeft}
-      navbarWidth={props.navbarWidth}
-    />
-    <h3>{`Latest Data for ${props.data[0].name} (${props.stockData[0].lastUpdated})`}</h3>
-    <div className='stock__details-container'>
-      <div className='stock__detail'>
-        {`Open: $${props.stockData[0].recentValues[0].open.slice(0, -2)}`}
+export default class StockDetails extends React.Component {
+  render() {
+    return (
+      <div className='stock__details' id='details'>
+        <h2>Stock Details ({this.props.stock[0].name})</h2>
+        <StockChart
+          data={this.props.stock}
+          stockData={this.props.stockData}
+          colours={[this.props.colour]}
+          navbarLeft={this.props.navbarLeft}
+          navbarWidth={this.props.navbarWidth}
+        />
+        <h3>{`Latest Data for ${this.props.stock[0].name} (${this.props.stockData[0].lastUpdated})`}</h3>
+        <div className='stock__details-container'>
+          <div className='stock__details-info stock__detail'>
+            <div>Value</div>
+            <div>1-day</div>
+            <div>7-day</div>
+          </div>
+          {['Open', 'High', 'Low', 'Close'].map((detail) =>
+            <StockDetail values={this.props.stockData[0].recentValues} detail={detail} key={detail} />
+          )}
+          <div className='stock__detail'>
+            {`Volume: ${this.props.stockData[0].recentValues[0].volume}`}
+          </div>
+        </div>
+        <p>Click any stock below to view its details.</p>
       </div>
-      <div className='stock__detail'>
-        {`High: $${props.stockData[0].recentValues[0].high.slice(0, -2)}`}
-      </div>
-      <div className='stock__detail'>
-        {`Low: $${props.stockData[0].recentValues[0].low.slice(0, -2)}`}
-      </div>
-      <div className='stock__detail'>
-        {`Close: $${props.stockData[0].recentValues[0].close.slice(0, -2)}`}
-      </div>
-      <div className='stock__detail'>
-        {`Volume: ${props.stockData[0].recentValues[0].volume}`}
-      </div>
-    </div>
-    {/*
-    <div>Form/button to select which stock to view, only allow one</div>
-    */}
-  </div>
-);
+    );
+  }
+}
