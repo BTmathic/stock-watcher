@@ -1,9 +1,22 @@
 import React from 'react';
 
 export default class StockTicker extends React.Component {
-  handleClick = () => {
+  state = {
+    opacity: 1
+  }
+
+  handleClick = (e) => {
     if (this.props.history) {
       this.props.handleTicketClick(this.props.ticker);
+    }
+  }
+
+  handleFade = (e) => {
+    console.log(e.target);
+    for (let i=1; i < 11; i++) {
+      setTimeout(() => {
+        this.setState(() => ({ opacity: (10 - i)/10 }));
+      }, 30*i);
     }
   }
 
@@ -26,7 +39,7 @@ export default class StockTicker extends React.Component {
           this.props.history ? 'stocks__stock-hover' : ''].join(' ')}
         key={this.props.ticker}
         onClick={this.handleClick}
-        style={{ borderLeft: 0.7 + `rem solid ${this.props.colour}` }}>
+        style={{ borderLeft: 0.7 + `rem solid ${this.props.colour}`, opacity: this.state.opacity }}>
         <div className='stocks__stock-ticker'>
           {this.props.ticker}
           <span style={{ color: this.handleValueChange(currentClose, prevClose) >= 0 ? 'green' : 'red' }}>
@@ -44,7 +57,13 @@ export default class StockTicker extends React.Component {
             </div>
             <p>Volume: {this.props.stockData.recentValues[0].volume}</p>
           </div>
-          <div className='stocks__delete-stock' onClick={(e) => this.props.deleteStock(e, this.props.ticker, this.props.history)}>x</div>
+          <div className='stocks__delete-stock'
+            onClick={(e) => {
+              e.stopPropagation(); // prevent loading data into details component with history ticket click
+              this.handleFade(e);
+              setTimeout(() => this.props.deleteStock(e, this.props.ticker, this.props.history), 350);
+            }}
+          >x</div>
         </div>
       </div>
     );
