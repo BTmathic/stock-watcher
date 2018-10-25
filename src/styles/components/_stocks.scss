@@ -133,10 +133,24 @@
       }
     }
   }
-  .stock__information p {
-    background: grey;
-    margin: 0 5rem;
-    padding: 2rem;
+  .stock__information {
+    p {
+      background: grey;
+      margin: 0 5rem;
+      padding: 2rem;
+    }
+    .information {
+      margin: 2rem;
+      .information__question {
+        cursor: pointer;
+      }
+      .information__answer {
+        background: #444;
+        border-radius: 5px;
+        margin: 0.5rem 1rem;
+        padding: 1rem 2rem;
+      }
+    }
   }
   .stock__error {
     color: $off-white;

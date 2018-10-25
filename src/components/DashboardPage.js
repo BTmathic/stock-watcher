@@ -24,7 +24,6 @@ class DashboardPage extends React.Component {
   };
 
   deleteStock = (e, ticker, history) => {
-    
     this.setState(() => ({ removeStock: ticker }));
     if (history) {
       this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
