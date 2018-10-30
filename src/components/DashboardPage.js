@@ -16,8 +16,6 @@ class DashboardPage extends React.Component {
     detailsStock: this.props.stocks[0].name,
     err: '',
     hover: '',
-    navbarActive: 'topTop',
-    navbarPrevious: 'topTop',
     navbarLeft: 0,
     navbarWidth: 0,
     newStock: '',
@@ -157,28 +155,6 @@ class DashboardPage extends React.Component {
   };
 
   componentDidMount() {
-    let navbarActive = '';
-    window.onscroll = () => {
-      if (window.scrollY < this.watching.offsetTop - 250) {
-        navbarActive = 'topTop';
-      } else if (window.scrollY < this.details.offsetTop - 250) {
-        navbarActive = 'topWatching';
-      } else if (window.scrollY < this.history.offsetTop - 250) {
-        navbarActive = 'topDetails';
-      } else if (window.scrollY < this.information.offsetTop - 250) {
-        navbarActive = 'topHistory';
-      } else if (window.scrollY < this.questions.offsetTop - 450) {
-        navbarActive = 'topInformation';
-      } else {
-        navbarActive = 'topQuestions';
-      }
-      if (this.state.navbarActive !== navbarActive) {
-        this.setState((prevState) => ({
-          navbarActive,
-          navbarPrevious: prevState.navbarActive
-        }));
-      }
-    };
     this.setState(() => ({
       topTop: 0,
       topDetails: this.details.offsetTop,
@@ -209,7 +185,11 @@ class DashboardPage extends React.Component {
         <div className='content-container'>
           <DashboardNavbar
             setPosition={(left, width) => this.setState(() => ({ navbarLeft: left, navbarWidth: width }))}
-            navbarActive={this.state.navbarActive}
+            topDetails={this.state.topDetails}
+            topWatching={this.state.topWatching}
+            topHistory={this.state.topHistory}
+            topInformation={this.state.topInformation}
+            topQuestions={this.state.topQuestions}
           />
           <div className='stocks'>
             <StockChart

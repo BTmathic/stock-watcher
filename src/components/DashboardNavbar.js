@@ -1,12 +1,41 @@
 import React from 'react';
 
 export default class DashboardNavbar extends React.Component {
+  state = {
+    navbarActive: 'topTop',
+    navbarPrev: 'topTop'
+  }
+
+  handleScroll = () => {
+    let navbarActive = '';
+    if (window.scrollY < this.props.topWatching - 250) {
+      navbarActive = 'topTop';
+    } else if (window.scrollY < this.props.topDetails - 250) {
+      navbarActive = 'topWatching';
+    } else if (window.scrollY < this.props.topHistory - 250) {
+      navbarActive = 'topDetails';
+    } else if (window.scrollY < this.props.topInformation - 250) {
+      navbarActive = 'topHistory';
+    } else if (window.scrollY < this.props.topQuestions - 450) {
+      navbarActive = 'topInformation';
+    } else {
+      navbarActive = 'topQuestions';
+    }
+    if (this.state.navbarActive !== navbarActive) {
+      this.setState((prevState) => ({
+        navbarActive,
+        navbarPrevious: prevState.navbarActive
+      }));
+    }
+  }
+
   resize = () => {
     this.props.setPosition(this.navbar.offsetLeft, this.navbar.offsetWidth);
   }
   
   componentDidMount() {
     window.addEventListener('resize', this.resize);
+    window.addEventListener('scroll', this.handleScroll);
     this.props.setPosition(this.navbar.offsetLeft, this.navbar.offsetWidth);
   }
 
@@ -15,7 +44,7 @@ export default class DashboardNavbar extends React.Component {
   };
 
   render() {
-    const navbarActive = this.props.navbarActive.split('top')[1].toLowerCase();
+    const navbarActive = this.state.navbarActive.split('top')[1].toLowerCase();
     return (
       <nav id='navbar' ref={(navbar) => this.navbar = navbar}>
         <a href='#top'><div className={navbarActive === 'top' ? 'navbarActive' : ''}>View Stock Data</div></a>
