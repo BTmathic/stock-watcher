@@ -16,11 +16,19 @@ class DashboardPage extends React.Component {
     detailsStock: this.props.stocks[0].name,
     err: '',
     hover: '',
+    navbarActive: 'topTop',
+    navbarPrevious: 'topTop',
     navbarLeft: 0,
     navbarWidth: 0,
     newStock: '',
     portfolio: [],
-    removeStock: ''
+    removeStock: '',
+    topTop: 0,
+    topDetails: 0,
+    topHistory: 0,
+    topInformation: 0,
+    topQuestions: 0,
+    topWatching: 0
   };
 
   deleteStock = (e, ticker, history) => {
@@ -148,6 +156,39 @@ class DashboardPage extends React.Component {
     }
   };
 
+  componentDidMount() {
+    let navbarActive = '';
+    window.onscroll = () => {
+      if (window.scrollY < this.watching.offsetTop - 250) {
+        navbarActive = 'topTop';
+      } else if (window.scrollY < this.details.offsetTop - 250) {
+        navbarActive = 'topWatching';
+      } else if (window.scrollY < this.history.offsetTop - 250) {
+        navbarActive = 'topDetails';
+      } else if (window.scrollY < this.information.offsetTop - 250) {
+        navbarActive = 'topHistory';
+      } else if (window.scrollY < this.questions.offsetTop - 450) {
+        navbarActive = 'topInformation';
+      } else {
+        navbarActive = 'topQuestions';
+      }
+      if (this.state.navbarActive !== navbarActive) {
+        this.setState((prevState) => ({
+          navbarActive,
+          navbarPrevious: prevState.navbarActive
+        }));
+      }
+    };
+    this.setState(() => ({
+      topTop: 0,
+      topDetails: this.details.offsetTop,
+      topWatching: this.watching.offsetTop,
+      topHistory: this.history.offsetTop,
+      topInformation: this.information.offsetTop,
+      topQuestions: this.questions.offsetTop
+    }));
+  }
+
   componentWillMount() {
     const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
     if (portfolio.length > 0) {
@@ -166,7 +207,10 @@ class DashboardPage extends React.Component {
     return (
       <div className='main-page'>
         <div className='content-container'>
-          <DashboardNavbar setPosition={(left, width) => this.setState(() => ({ navbarLeft: left, navbarWidth: width }))} />
+          <DashboardNavbar
+            setPosition={(left, width) => this.setState(() => ({ navbarLeft: left, navbarWidth: width }))}
+            navbarActive={this.state.navbarActive}
+          />
           <div className='stocks'>
             <StockChart
               data={this.state.portfolio.filter((stock) => stock.watching)}
@@ -175,7 +219,11 @@ class DashboardPage extends React.Component {
               navbarLeft={this.state.navbarLeft}
               navbarWidth={this.state.navbarWidth}
             />
-              <div className='stocks__watching' id='watching'>
+              <div
+                className='stocks__watching'
+                id='watching'
+                ref={(watching) => this.watching = watching}
+              >
                 {
                   this.state.portfolio.length === 0 ? (
                     <div className='stocks__stock'>
@@ -221,21 +269,29 @@ class DashboardPage extends React.Component {
                 </div>
               </div>
             <div className='stock__error'>{this.state.err}</div>
-            <StockDetails
-              colour={colours[0]}
-              stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
-              navbarLeft={this.state.navbarLeft}
-              navbarWidth={this.state.navbarWidth}
-              stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
-            />
-            <StockHistory
-              deleteStock={this.deleteStock}
-              stocks={this.state.portfolio}
-              stockData={this.props.stockData}
-              handleTicketClick={(detailsStock) => this.setState(() => ({ detailsStock }))}
-            />
-            <StockInformation />
-            <Questions />
+            <div ref={(details) => this.details = details}>
+              <StockDetails
+                colour={colours[0]}
+                stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
+                navbarLeft={this.state.navbarLeft}
+                navbarWidth={this.state.navbarWidth}
+                stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+              />
+            </div>
+            <div ref={(history) => this.history = history}>
+              <StockHistory
+                deleteStock={this.deleteStock}
+                stocks={this.state.portfolio}
+                stockData={this.props.stockData}
+                handleTicketClick={(detailsStock) => this.setState(() => ({ detailsStock }))}
+              />
+            </div>
+            <div ref={(information) => this.information = information}>
+              <StockInformation />
+            </div>
+            <div ref={(questions) => this.questions = questions}>
+              <Questions />
+            </div>
           </div>
         </div>
       </div>

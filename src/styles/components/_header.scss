@@ -9,13 +9,14 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
-  padding: $s-size 0;
+  padding: $xs-size 0;
 }
 
 .header__title {
   color: $off-white;
   text-decoration: none;
   h1 {
-      margin: 0;
+    font-size: 3rem; // we specify rem instead of the default em to allow easy padding elsewhere
+    margin: 0;
   }
 }

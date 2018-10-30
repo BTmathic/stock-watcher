@@ -93,14 +93,14 @@
       }
     }
   }
-  .stock__viewing-history, .stock__information, .stock__questions {
+  .stock__history, .stock__information, .stock__questions {
     color: $off-white;
     padding: 0 1rem;
   }
   .stock__details {
     color: $off-white;
     h2 {
-      margin-bottom: -65px;
+      margin-bottom: -5rem;
       padding-left: 1rem;
     }
     h3 {
@@ -159,7 +159,7 @@
   .stocks__chart {
     background: lighten(black, 10%);
     border-radius: 5px;
-    margin: 75px 0 2rem;
+    margin: 5.7rem 0 $m-size;
     .chart--axis {
       color: $off-white;
     }

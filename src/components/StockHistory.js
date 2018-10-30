@@ -2,7 +2,7 @@ import React from 'react';
 import StockTicket from './StockTicket';
 
 export default (props) => (
-  <div className='stock__viewing-history' id='viewing-history'>
+  <div className='stock__history' id='history'>
     <h2>Stock Watching History</h2>
     <div className='stocks__watching'>
       {

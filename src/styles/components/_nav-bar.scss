@@ -2,7 +2,7 @@ nav {
   background: lighten($blue, 10%);
   color: white;
   height: 100vh;
-  margin-top: 75px;
+  margin-top: 5.8rem;
   position: fixed;
   width: 20rem;
   a {
@@ -13,5 +13,9 @@ nav {
     color: $off-white;
     margin: 0.5rem 1rem;
     padding: 1rem;
+  }
+  .navbarActive {
+    font-size: 110%;
+    font-weight: bold;
   }
 }
