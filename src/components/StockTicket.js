@@ -20,12 +20,12 @@ export default class StockTicker extends React.Component {
   }
 
   handleValueChange = (current, previousClose) => {
-    const change = Math.round(100 * (current - previousClose)) / 100;
+    const change = (current - previousClose).toFixed(2);
     return (change > 0 ? '+' : '') + change;
   }
 
   handleValueChangePercent = (current, previousClose) => {
-    const change = Math.round(10000*(current-previousClose)/previousClose)/100;
+    const change = (100*(current - previousClose) / previousClose).toFixed(2);
     return (change > 0 ? '+' : '') + change;
   }
   
