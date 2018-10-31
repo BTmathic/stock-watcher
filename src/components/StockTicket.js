@@ -12,7 +12,6 @@ export default class StockTicker extends React.Component {
   }
 
   handleFade = (e) => {
-    console.log(e.target);
     for (let i=1; i < 11; i++) {
       setTimeout(() => {
         this.setState(() => ({ opacity: (10 - i)/10 }));

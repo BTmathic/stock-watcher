@@ -30,6 +30,8 @@ class DashboardPage extends React.Component {
   };
 
   deleteStock = (e, ticker, history) => {
+    const portfolio = this.state.portfolio;
+    const watching = portfolio.filter((stock) => stock.watching);
     this.setState(() => ({ removeStock: ticker }));
     if (history) {
       this.props.startRemoveStock(this.props.stocks.filter((stock) => stock.name === ticker)[0].id, false);
@@ -40,6 +42,9 @@ class DashboardPage extends React.Component {
         portfolio,
         removeStock: ''
       }));
+      if (portfolio.length % 3 === 1 || watching.length % 3 === 1) {
+        this.onPageUpdate()
+      }
       if (portfolio.length === 0) {
         this.setState(() => ({ dataUpTo: '' }));
       }
@@ -52,6 +57,9 @@ class DashboardPage extends React.Component {
         }
       }
       this.setState(() => ({ portfolio }));
+      if (watching.length % 3 === 1) {
+        this.onPageUpdate()
+      }
     }
   };
 
@@ -72,6 +80,20 @@ class DashboardPage extends React.Component {
     }));
   };
 
+  onPageUpdate = () => {
+    setTimeout(() => {
+      // need to allow the page to re-render before computing new positions
+      this.setState(() => ({
+        topTop: 0,
+        topDetails: this.details.offsetTop,
+        topWatching: this.watching.offsetTop,
+        topHistory: this.history.offsetTop,
+        topInformation: this.information.offsetTop,
+        topQuestions: this.questions.offsetTop
+      }));
+    }, 300);
+  }
+
   onSubmit = (e) => {
     e.preventDefault();
     // Fetch weekly stock data for stock with ticker this.state.newStock
@@ -83,6 +105,7 @@ class DashboardPage extends React.Component {
     // if user is trying to add a stock already in their portfolio. Though we allow
     // refetching if user is updating old stock data
     const portfolio = this.state.portfolio;
+    const watching = portfolio.filter((stock) => stock.watching);
     if (portfolio.filter((stock) => stock.name === this.state.newStock.toUpperCase()).length === 0) {
       const stockData = this.props.stockData.filter((stock) => stock.name === this.state.newStock.toUpperCase());
       if (stockData.length === 0) {
@@ -132,11 +155,17 @@ class DashboardPage extends React.Component {
               this.setState(() => ({ err: `No stock with ticker ${this.state.newStock.toUpperCase()} found` }))
             }
           });
+        if (portfolio.length % 3 === 0 || watching.length % 3 === 0) {
+          this.onPageUpdate();
+        }
       } else {
         this.loadStockToDisplay(stockData[0]);
       }
     } else {
       if (this.state.portfolio.filter((stock) => !stock.watching && stock.name === this.state.newStock.toUpperCase()).length > 0) {
+        if (portfolio.length % 3 === 0 || watching.length % 3 === 0) {
+          this.onPageUpdate();
+        }
         this.props.startEditStock(this.props.stocks.filter((stock) => stock.name === this.state.newStock.toUpperCase())[0].id, true);
         for (let i=0; i < portfolio.length; i++) {
           if (portfolio[i].name === this.state.newStock.toUpperCase()) {
@@ -163,7 +192,7 @@ class DashboardPage extends React.Component {
       topInformation: this.information.offsetTop,
       topQuestions: this.questions.offsetTop
     }));
-  }
+  };
 
   componentWillMount() {
     const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
@@ -267,7 +296,7 @@ class DashboardPage extends React.Component {
               />
             </div>
             <div ref={(information) => this.information = information}>
-              <StockInformation />
+              <StockInformation onPageUpdate={this.onPageUpdate}/>
             </div>
             <div ref={(questions) => this.questions = questions}>
               <Questions />

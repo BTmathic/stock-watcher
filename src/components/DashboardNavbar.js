@@ -34,12 +34,13 @@ export default class DashboardNavbar extends React.Component {
   }
   
   componentDidMount() {
-    window.addEventListener('resize', this.resize);
     window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('resize', this.resize);
     this.props.setPosition(this.navbar.offsetLeft, this.navbar.offsetWidth);
   }
 
   componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
     window.removeEventListener('resize', this.resize);
   };
 

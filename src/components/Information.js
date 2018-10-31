@@ -7,6 +7,7 @@ export default class Information extends React.Component {
 
   toggleVisible = () => {
     this.setState((prevState) => ({ visible: !prevState.visible }));
+    this.props.onPageUpdate();
   }
   
   render() {
@@ -18,7 +19,11 @@ export default class Information extends React.Component {
         {
           this.state.visible && <div className='information__answer'>
             {this.props.answer}
+            <div className='information__more'>
+              {<a target='_blank' href={this.props.more}>Read more</a>}
+            </div>
           </div>
+
         }
       </div>
     );
