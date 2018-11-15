@@ -1,0 +1,42 @@
+.landing-display {
+  align-items: center;
+  background: #111;
+  color: $off-white;
+  display: flex;
+  height: calc(100vh - 75px);
+  justify-content: center;
+  margin-bottom: 17.5rem;
+  text-align: center;
+  .landing-display__panel {
+    margin: 0;
+    width: 40%;
+    .landing-display--image {
+      background: url('/Images/bg.jpg');
+      background-size: cover;
+      border-radius: 25px;
+      height: 0;
+      padding-top: 75%;
+      width: 100%;
+      .landing-display--image-inlay {
+        background: url('/Images/stock.png');
+        background-size: cover;
+        border-radius: 15px;
+        height: 0;
+        margin: -62.5% auto 0;
+        padding-top: 50%;
+        width: 80%;
+      }
+    }
+    .landing-display--buttons {
+      display: flex;
+      justify-content: center;
+      .landing-display--button {
+        border: 2px solid $off-white;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 0.5rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  }
+}

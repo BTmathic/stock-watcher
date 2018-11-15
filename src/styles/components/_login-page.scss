@@ -1,41 +1,32 @@
-.landing-display {
-  align-items: center;
-  background: #111;
-  color: $off-white;
-  display: flex;
-  height: calc(100vh - 75px);
-  justify-content: center;
-  margin-bottom: 17.5rem;
-  text-align: center;
-  .landing-display__panel {
-    margin: 0;
-    width: 40%;
-    .landing-display--image {
-      background: url('/Images/bg.jpg');
-      background-size: cover;
-      border-radius: 25px;
-      height: 0;
-      padding-top: 75%;
-      width: 100%;
-      .landing-display--image-inlay {
-        background: url('/Images/stock.png');
-        background-size: cover;
-        border-radius: 15px;
-        height: 0;
-        margin: -62.5% auto 0;
-        padding-top: 50%;
-        width: 80%;
+.login {
+  h3 {
+    text-align: center;
+  }
+  form {
+    margin: 0 auto;
+    width: 30%;
+    .login--input {
+      display: flex;
+      justify-content: space-between;
+      input {
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 0.2rem;
       }
     }
-    .landing-display--buttons {
-      display: flex;
-      justify-content: center;
-      .landing-display--button {
-        border: 2px solid $off-white;
+    .login--buttons {
+      margin: 0 auto;
+      padding-top: 0.5rem;
+      width: 80%;
+      .login--button {
+        background: $grey;
+        border: none;
         border-radius: 5px;
+        color: white;
         cursor: pointer;
-        margin: 0 0.5rem;
-        padding: 0.5rem 1rem;
+        margin: 1rem;
+        padding: 1rem 0;
+        width: 40%; 
       }
     }
   }

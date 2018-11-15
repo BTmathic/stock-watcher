@@ -11,7 +11,7 @@ export const Header = ({ uid, startLogin, startLogout }) => (
           <h1>Stock Watcher</h1>
         </Link>
         {uid ? <button className='button button--header' onClick={startLogout}>Logout</button>
-          : <button className='button' onClick={startLogin}>Login with Google</button>
+          : <button className='button' onClick={startLogin}>Get Started</button>
         }
       </div>
     </div>

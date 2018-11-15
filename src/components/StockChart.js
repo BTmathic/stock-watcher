@@ -33,7 +33,7 @@ export default class StockChart extends React.Component {
     const colours = this.props.colours;
     const parseTime = d3.timeParse('%Y-%m-%d');
     const bisectDate = d3.bisector((d) => d.date).left;
-    const margin = {top: 20, right: 40, bottom: 80, left: 40}
+    const margin = {top: 20, right: 40, bottom: 80, left: 45}
     const width = Math.min(768 - margin.left - margin.right, window.innerWidth - this.props.navbarWidth - 1.5*(margin.left + margin.right));
     const height = Math.max(320, window.innerHeight - margin.top - margin.bottom - 75*2); // -75 for header and for bottom stock info, minimum for landscape view on mobile devices
     const x = d3.scaleTime().range([0, width]);
