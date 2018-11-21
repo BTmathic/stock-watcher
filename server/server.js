@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const port = process.env.PORT || 3000;
 const publicPath = path.join(__dirname, '..', 'public');
@@ -6,10 +7,11 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const flash = require('connect-flash');
 const passport = require('passport');
-const session = require('express-session');
+//const session = require('express-session');
 
 const auth = require('./routes/auth.js');
-const routes = require('./routes/api.js');
+const authRoutes = require('./routes/authRoutes');
+const update = require('./routes/updateStocks.js');
 const app = express();
 
 const admin = require('firebase-admin');
@@ -27,23 +29,24 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(flash());
 
-console.log(process.env.SESSION_SECRET);
-
+/*
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true
 }));
+*/
 
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-auth(app, db);
-routes(app, db);
+auth(app, admin);
+authRoutes(app, admin);
+update(app, db);
 
 app.listen(port, () => {
     console.log('Server is up!');

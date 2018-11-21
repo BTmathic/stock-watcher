@@ -1,30 +1,119 @@
 import React from 'react';
+import bcryptjs from 'bcryptjs';
+import { connect } from 'react-redux';
 import { history } from '../routers/AppRouter';
+import { login } from '../actions/auth';
+import { startSetStockData } from '../actions/stockData';
+import { startSetStocks } from '../actions/stocks';
 
-export default class LoginPage extends React.Component {
-  // try to build authentication with history and all methods here?
-  // need to be careful about only storing hashed values for passwords instead of plain text
-  // do not store in state, store hashed value in state as user types password in
+
+export class LoginPage extends React.Component {
+  state = {
+    loginError: '',
+    registerError: ''
+  }
+
+  handleLogin = (e) => {
+    e.preventDefault();
+    // hash password so even if compromised the password will not be exposed
+    fetch('/login', {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        'username': e.target[0].value,
+        'password': e.target[1].value
+      })
+    }).then((res) => res.json()).then((json) => {
+      if (!!json.error) {
+        this.setState(() => ({ loginError: json.error }))
+      } else {
+
+      }
+    }).catch((err) => console.log(err));
+  };
+
+  handleRegister = (e) => {
+    e.preventDefault();
+    // hash password so even if compromised the password will not be exposed
+    fetch('/register', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({
+        'username': e.target[0].value,
+        'password': e.target[1].value
+      })
+    }).then((res) => res.json()).then((json) => {
+      if (!!json.error) {
+        this.setState(() => ({ registerError: json.error }))
+      } else {
+        // Registration successful
+        console.log('Registration successful');
+        Promise.all([
+          this.props.login(json.username),
+          this.props.startSetStockData(),
+          this.props.startSetStocks()
+        ]).then(() => history.push('/dashboard'));
+      }
+    }).catch((err) => console.log(err));
+  }
   
   render() {
     return (
-      <div className='login'>
-        <h3>Login or Sign Up</h3>
-        <form>
-          <div className='login--input'>
-            <label>Username</label>
-            <input type='text' />
-          </div>
-          <div className='login--input'>
-            <label>Password</label>
-            <input type='password' />
-          </div>
-          <div className='login--buttons'>
-            <input type='button' value='Login' className='login--button' />
-            <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/dashboard')} />
-          </div>
-        </form>
+      <div>
+        <div className='login'>
+          <h3>Login</h3>
+          <form onSubmit={this.handleLogin}>
+            <div className='login--input'>
+              <label>Username</label>
+              <input type='text' />
+            </div>
+            <div className='login--input'>
+              <label>Password</label>
+              <input type='password' />
+            </div>
+            <div className='login--buttons'>
+              <input type='submit' value='Login' className='login--button' />
+              <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
+            </div>
+          </form>
+        </div>
+        <div className='register'>
+          <h3>New User? Sign up</h3>
+          <form onSubmit={this.handleRegister}>
+            <div className='login--input'>
+              <label>Username</label>
+              <input type='text' />
+            </div>
+            <div className='login--input'>
+              <label>Password</label>
+              <input type='password' />
+            </div>
+            <div className='login--buttons'>
+              <input type='submit' value='Register' className='login--button' />
+              <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
+            </div>
+          </form>
+          {
+            <div className='error'>
+              {this.state.registerError}
+            </div>
+          }
+        </div>
       </div>
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  login: (uid) => dispatch(login(uid)),
+  startSetStockData: () => dispatch(startSetStockData()),
+  startSetStocks: () => dispatch(startSetStocks())
+});
+
+export default connect(undefined, mapDispatchToProps)(LoginPage);

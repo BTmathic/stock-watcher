@@ -13,7 +13,7 @@ import { startAddStock, startEditStock, startRemoveStock } from '../actions/stoc
 class DashboardPage extends React.Component {
   state = {
     dataUpTo: '',
-    detailsStock: this.props.stocks[0].name,
+    detailsStock: '',
     err: '',
     hover: '',
     navbarLeft: 0,
@@ -195,6 +195,9 @@ class DashboardPage extends React.Component {
   };
 
   componentWillMount() {
+    if (this.props.stockData.length === 0) {
+      this.props.startAddStock('GOOG');
+    }
     const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
     if (portfolio.length > 0) {
       const dataUpTo = this.props.stockData[0].lastUpdated;

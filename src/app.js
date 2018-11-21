@@ -31,6 +31,11 @@ const renderApp = () => {
 
 ReactDOM.render(<LoadingPage />, document.getElementById('app'));
 
+store.dispatch(logout());
+renderApp();
+history.push('/');
+
+/*
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
     Promise.all([
@@ -50,3 +55,4 @@ firebase.auth().onAuthStateChanged((user) => {
     history.push('/');
   }
 });
+*/
