@@ -184,6 +184,8 @@ class DashboardPage extends React.Component {
   };
 
   componentDidMount() {
+    console.log('test');
+    console.log(this.props.stockData);
     this.setState(() => ({
       topTop: 0,
       topDetails: this.details.offsetTop,
@@ -195,9 +197,6 @@ class DashboardPage extends React.Component {
   };
 
   componentWillMount() {
-    if (this.props.stockData.length === 0) {
-      this.props.startAddStock('GOOG');
-    }
     const portfolio = this.props.stocks.map((stock) => ({name: stock.name, watching: stock.watching}));
     if (portfolio.length > 0) {
       const dataUpTo = this.props.stockData[0].lastUpdated;
@@ -206,6 +205,11 @@ class DashboardPage extends React.Component {
         portfolio,
         stockData: this.props.stockData
       }));
+    }
+    if (this.props.stockData.length === 0) { // load sample for first time use
+      const sampleStock = { name: 'GOOG', watching: true };
+      this.props.startAddStock(sampleStock);
+      this.setState(() => ({ portfolio: [sampleStock], detailsStock: 'GOOG' }));
     }
   };
 
@@ -231,72 +235,75 @@ class DashboardPage extends React.Component {
               navbarLeft={this.state.navbarLeft}
               navbarWidth={this.state.navbarWidth}
             />
-              <div
-                className='stocks__watching'
-                id='watching'
-                ref={(watching) => this.watching = watching}
-              >
-                {
-                  this.state.portfolio.length === 0 ? (
-                    <div className='stocks__stock'>
-                      <span>Enter a ticker to begin</span>
-                    </div>
-                  ) : (
-                    this.state.portfolio.map((stock) => {
-                      if (stock.watching) {
-                        colourIndex++;
-                        const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name)[0];
-                        if (stockData === undefined) {
-                          return (<div></div>);
-                        } else {
-                          return <StockTicket
-                            key={stock.name}
-                            removeStock={this.state.removeStock}
-                            ticker={stock.name}
-                            colour={colours[colourIndex % colours.length]}
-                            stockData={stockData}
-                            deleteStock={this.deleteStock}
-                            history={false}
-                          />;
-                        }
+            <div
+              className='stocks__watching'
+              id='watching'
+              ref={(watching) => this.watching = watching}
+            >
+              {
+                this.state.portfolio.length === 0 ? (
+                  <div className='stocks__stock'>
+                    <span>Enter a ticker to begin</span>
+                  </div>
+                ) : (
+                  this.state.portfolio.map((stock) => {
+                    if (stock.watching) {
+                      colourIndex++;
+                      const stockData = this.props.stockData.filter((stockData) => stockData.name === stock.name)[0];
+                      if (stockData === undefined) {
+                        return (<div></div>);
+                      } else {
+                        return <StockTicket
+                          key={stock.name}
+                          removeStock={this.state.removeStock}
+                          ticker={stock.name}
+                          colour={colours[colourIndex % colours.length]}
+                          stockData={stockData}
+                          deleteStock={this.deleteStock}
+                          history={false}
+                        />;
                       }
-                    })
-                  )
-                }
+                    }
+                  })
+                )
+              }
+            </div>
+            <div className='stocks__watching-add'>
+              <div className='stocks__stock stocks__add-stock'>
+                <form onSubmit={this.onSubmit}>
+                  <input
+                    name='newStock'
+                    className='stocks__add-stock-ticker'
+                    type='text'
+                    placeholder='Stock tag'
+                    value={this.state.newStock}
+                    onChange={this.handleInput}
+                    required
+                  />
+                  <input type='submit' className='stocks__submit-stock-ticker' />
+                </form>
               </div>
-              <div className='stocks__watching-add'>
-                <div className='stocks__stock stocks__add-stock'>
-                  <form onSubmit={this.onSubmit}>
-                    <input
-                      name='newStock'
-                      className='stocks__add-stock-ticker'
-                      type='text'
-                      placeholder='Stock tag'
-                      value={this.state.newStock}
-                      onChange={this.handleInput}
-                      required
-                    />
-                    <input type='submit' className='stocks__submit-stock-ticker' />
-                  </form>
-                </div>
-              </div>
-            <div className='stock__error'>{this.state.err}</div>
-            <div ref={(details) => this.details = details}>
-              <StockDetails
+            </div>
+          <div className='stock__error'>{this.state.err}</div>
+          <div ref={(details) => this.details = details}>
+            {
+              false && <StockDetails
                 colour={colours[0]}
                 stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
                 navbarLeft={this.state.navbarLeft}
                 navbarWidth={this.state.navbarWidth}
                 stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
               />
-            </div>
-            <div ref={(history) => this.history = history}>
-              <StockHistory
-                deleteStock={this.deleteStock}
-                stocks={this.state.portfolio}
-                stockData={this.props.stockData}
-                handleTicketClick={(detailsStock) => this.setState(() => ({ detailsStock }))}
-              />
+            }
+            
+          </div>
+          <div ref={(history) => this.history = history}>
+            <StockHistory
+              deleteStock={this.deleteStock}
+              stocks={this.state.portfolio}
+              stockData={this.props.stockData}
+              handleTicketClick={(detailsStock) => this.setState(() => ({ detailsStock }))}
+            />
             </div>
             <div ref={(information) => this.information = information}>
               <StockInformation onPageUpdate={this.onPageUpdate}/>

@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const flash = require('connect-flash');
 const passport = require('passport');
-//const session = require('express-session');
 
 const auth = require('./routes/auth.js');
 const authRoutes = require('./routes/authRoutes');
@@ -19,7 +18,9 @@ const serviceAccount = require('../stock-watcher-fb-adminsdk.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://stock-watcher-28e02.firebaseio.com/',
-  databaseAuthVariableOverride: null
+  databaseAuthVariableOverride: {
+    uid: 'my-service-worker'
+  }
 });
 
 const db = admin.database();
@@ -29,16 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(flash());
 
-/*
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true
-}));
-*/
-
 app.use(passport.initialize());
-//app.use(passport.session());
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));

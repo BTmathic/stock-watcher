@@ -1,11 +1,11 @@
 import React from 'react';
 import bcryptjs from 'bcryptjs';
 import { connect } from 'react-redux';
-import { history } from '../routers/AppRouter';
-import { login } from '../actions/auth';
+import { firebase } from '../firebase/firebase';
 import { startSetStockData } from '../actions/stockData';
 import { startSetStocks } from '../actions/stocks';
-
+import { history } from '../routers/AppRouter';
+import { login } from '../actions/auth';
 
 export class LoginPage extends React.Component {
   state = {
@@ -23,7 +23,7 @@ export class LoginPage extends React.Component {
         'Content-Type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
-        'username': e.target[0].value,
+        'email': e.target[0].value,
         'password': e.target[1].value
       })
     }).then((res) => res.json()).then((json) => {
@@ -37,7 +37,9 @@ export class LoginPage extends React.Component {
 
   handleRegister = (e) => {
     e.preventDefault();
-    // hash password so even if compromised the password will not be exposed
+    /*****
+    / hash password here so even if compromised the password will not be exposed
+    ******/
     fetch('/register', {
       method: 'POST',
       mode: 'cors',
@@ -45,20 +47,26 @@ export class LoginPage extends React.Component {
         'Content-Type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
-        'username': e.target[0].value,
+        'email': e.target[0].value,
         'password': e.target[1].value
       })
-    }).then((res) => res.json()).then((json) => {
+    }).then((res) => {
+      return res.json()
+    }).then((json) => {
       if (!!json.error) {
         this.setState(() => ({ registerError: json.error }))
       } else {
-        // Registration successful
-        console.log('Registration successful');
+        console.log(json);
         Promise.all([
-          this.props.login(json.username),
+          firebase.auth().signInWithEmailAndPassword(json.email, json.hash).catch((err) => {
+            console.log('Problem logging in:', err.code, err.message);
+          }),
+          this.props.login(json.uid),
           this.props.startSetStockData(),
           this.props.startSetStocks()
-        ]).then(() => history.push('/dashboard'));
+        ]).then(() => {
+          history.push('/dashboard')
+        });
       }
     }).catch((err) => console.log(err));
   }
@@ -70,8 +78,8 @@ export class LoginPage extends React.Component {
           <h3>Login</h3>
           <form onSubmit={this.handleLogin}>
             <div className='login--input'>
-              <label>Username</label>
-              <input type='text' />
+              <label>Email</label>
+              <input type='email' />
             </div>
             <div className='login--input'>
               <label>Password</label>
@@ -87,8 +95,8 @@ export class LoginPage extends React.Component {
           <h3>New User? Sign up</h3>
           <form onSubmit={this.handleRegister}>
             <div className='login--input'>
-              <label>Username</label>
-              <input type='text' />
+              <label>Email</label>
+              <input type='email' />
             </div>
             <div className='login--input'>
               <label>Password</label>

@@ -36,6 +36,7 @@
     "firebase": "4.2.0",
     "firebase-admin": "^6.0.0",
     "history": "^4.7.2",
+    "jwt-simple": "^0.5.5",
     "moment": "^2.22.1",
     "node-fetch": "^2.2.0",
     "node-sass": "4.5.3",
