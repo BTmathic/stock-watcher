@@ -184,8 +184,6 @@ class DashboardPage extends React.Component {
   };
 
   componentDidMount() {
-    console.log('test');
-    console.log(this.props.stockData);
     this.setState(() => ({
       topTop: 0,
       topDetails: this.details.offsetTop,
@@ -203,13 +201,9 @@ class DashboardPage extends React.Component {
       this.setState(() => ({
         dataUpTo,
         portfolio,
+        detailsStock: this.props.stocks[0].name,
         stockData: this.props.stockData
       }));
-    }
-    if (this.props.stockData.length === 0) { // load sample for first time use
-      const sampleStock = { name: 'GOOG', watching: true };
-      this.props.startAddStock(sampleStock);
-      this.setState(() => ({ portfolio: [sampleStock], detailsStock: 'GOOG' }));
     }
   };
 
@@ -286,16 +280,15 @@ class DashboardPage extends React.Component {
             </div>
           <div className='stock__error'>{this.state.err}</div>
           <div ref={(details) => this.details = details}>
-            {
-              false && <StockDetails
-                colour={colours[0]}
-                stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
-                navbarLeft={this.state.navbarLeft}
-                navbarWidth={this.state.navbarWidth}
-                stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
-              />
-            }
-            
+          { true && 
+            <StockDetails
+              colour={colours[0]}
+              stock={this.state.portfolio.filter((stock) => stock.name === this.state.detailsStock)}
+              navbarLeft={this.state.navbarLeft}
+              navbarWidth={this.state.navbarWidth}
+              stockData={this.props.stockData.filter((stock) => stock.name === this.state.detailsStock)}
+            />
+          }
           </div>
           <div ref={(history) => this.history = history}>
             <StockHistory

@@ -60,9 +60,8 @@ export const setStocks = (stocks) => ({
   stocks
 });
 
-export const startSetStocks = () => {
-  return (dispatch, getState) => {
-    const uid = getState().auth.uid;
+export const startSetStocks = (uid) => {
+  return (dispatch) => {
     return database.ref(`users/${uid}/stocks`).once('value').then((snapshot) => {
       const stocks = [];
       snapshot.forEach((childSnapshot) => {

@@ -5,7 +5,7 @@ import { firebase } from '../firebase/firebase';
 import { startSetStockData } from '../actions/stockData';
 import { startSetStocks } from '../actions/stocks';
 import { history } from '../routers/AppRouter';
-import { login } from '../actions/auth';
+import { login, logout, startAddUser } from '../actions/auth';
 
 export class LoginPage extends React.Component {
   state = {
@@ -37,38 +37,55 @@ export class LoginPage extends React.Component {
 
   handleRegister = (e) => {
     e.preventDefault();
-    /*****
-    / hash password here so even if compromised the password will not be exposed
-    ******/
-    fetch('/register', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({
-        'email': e.target[0].value,
-        'password': e.target[1].value
-      })
-    }).then((res) => {
-      return res.json()
-    }).then((json) => {
-      if (!!json.error) {
-        this.setState(() => ({ registerError: json.error }))
-      } else {
-        console.log(json);
+    if (e.target[1].value.length < 8) {
+      this.setState(() => ({ registerError: 'Password must be at least 8 characters'}));
+    } else {
+      this.setState(() => ({ registerError: '' }));
+      /*****
+      / hash password here so even if compromised the password will not be exposed
+      ******/
+      fetch('/register', {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+          'email': e.target[0].value,
+          'password': e.target[1].value
+        })
+      }).then((res) => {
+        return res.json()
+      }).then((json) => {
+        if (!!json.error) {
+          this.setState(() => ({ registerError: json.error }))
+        } else {
+          this.props.startAddUser(json.email, json.hash, json.salt);
+        }
+      }).catch((err) => console.log(err));
+    }
+  }
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        const uid = user.uid;
         Promise.all([
-          firebase.auth().signInWithEmailAndPassword(json.email, json.hash).catch((err) => {
-            console.log('Problem logging in:', err.code, err.message);
-          }),
-          this.props.login(json.uid),
           this.props.startSetStockData(),
-          this.props.startSetStocks()
+          this.props.startSetStocks(uid),
         ]).then(() => {
-          history.push('/dashboard')
+          this.props.login(uid)
+          if (history.location.pathname === '/login') {
+            history.push('/dashboard');
+          }
         });
+      } else {
+        this.props.logout();
+        if (history.location.pathname !== '/login') {
+          history.push('/');
+        }
       }
-    }).catch((err) => console.log(err));
+    });
   }
   
   render() {
@@ -120,8 +137,10 @@ export class LoginPage extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   login: (uid) => dispatch(login(uid)),
+  logout: () => dispatch(logout()),
+  startAddUser: (email, hash, salt) => dispatch(startAddUser(email, hash, salt)),
   startSetStockData: () => dispatch(startSetStockData()),
-  startSetStocks: () => dispatch(startSetStocks())
+  startSetStocks: (uid) => dispatch(startSetStocks(uid))
 });
 
 export default connect(undefined, mapDispatchToProps)(LoginPage);
