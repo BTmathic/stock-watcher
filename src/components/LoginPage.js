@@ -37,8 +37,12 @@ export class LoginPage extends React.Component {
 
   handleRegister = (e) => {
     e.preventDefault();
+    console.log(e.target[1].value, e.target[2].value,
+      e.target[1].value !== e.target[2].value);
     if (e.target[1].value.length < 8) {
       this.setState(() => ({ registerError: 'Password must be at least 8 characters'}));
+    } else if (e.target[1].value !== e.target[2].value) {
+      this.setState(() => ({ registerError: 'Passwords do not match'}));
     } else {
       this.setState(() => ({ registerError: '' }));
       /*****
@@ -102,6 +106,10 @@ export class LoginPage extends React.Component {
               <label>Password</label>
               <input type='password' />
             </div>
+            <div className='login--input'>
+              <label>Confirm Password</label>
+              <input type='password' />
+            </div>
             <div className='login--buttons'>
               <input type='submit' value='Login' className='login--button' />
               <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
@@ -117,6 +125,10 @@ export class LoginPage extends React.Component {
             </div>
             <div className='login--input'>
               <label>Password</label>
+              <input type='password' />
+            </div>
+            <div className='login--input'>
+              <label>Confirm Password</label>
               <input type='password' />
             </div>
             <div className='login--buttons'>
