@@ -5,7 +5,7 @@ import { firebase } from '../firebase/firebase';
 import { startSetStockData } from '../actions/stockData';
 import { startSetStocks } from '../actions/stocks';
 import { history } from '../routers/AppRouter';
-import { login, logout, startAddUser } from '../actions/auth';
+import { login, logout, startAddUser, startLogin } from '../actions/auth';
 
 export class LoginPage extends React.Component {
   state = {
@@ -15,7 +15,9 @@ export class LoginPage extends React.Component {
 
   handleLogin = (e) => {
     e.preventDefault();
+    this.setState(() => ({ loginError: '' }));
     // hash password so even if compromised the password will not be exposed
+    console.log('Get to fetch');
     fetch('/login', {
       method: 'POST',
       mode: 'cors',
@@ -30,15 +32,13 @@ export class LoginPage extends React.Component {
       if (!!json.error) {
         this.setState(() => ({ loginError: json.error }))
       } else {
-
+        this.props.startLogin(json.email, json.hash);
       }
     }).catch((err) => console.log(err));
   };
 
   handleRegister = (e) => {
     e.preventDefault();
-    console.log(e.target[1].value, e.target[2].value,
-      e.target[1].value !== e.target[2].value);
     if (e.target[1].value.length < 8) {
       this.setState(() => ({ registerError: 'Password must be at least 8 characters'}));
     } else if (e.target[1].value !== e.target[2].value) {
@@ -58,13 +58,11 @@ export class LoginPage extends React.Component {
           'email': e.target[0].value,
           'password': e.target[1].value
         })
-      }).then((res) => {
-        return res.json()
-      }).then((json) => {
+      }).then((res) => res.json()).then((json) => {
         if (!!json.error) {
           this.setState(() => ({ registerError: json.error }))
         } else {
-          this.props.startAddUser(json.email, json.hash, json.salt);
+          this.props.startAddUser(json.email, json.hash);
         }
       }).catch((err) => console.log(err));
     }
@@ -106,15 +104,16 @@ export class LoginPage extends React.Component {
               <label>Password</label>
               <input type='password' />
             </div>
-            <div className='login--input'>
-              <label>Confirm Password</label>
-              <input type='password' />
-            </div>
             <div className='login--buttons'>
               <input type='submit' value='Login' className='login--button' />
               <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
             </div>
           </form>
+          {
+            <div className='error'>
+              {this.state.loginError}
+            </div>
+          }
         </div>
         <div className='register'>
           <h3>New User? Sign up</h3>
@@ -150,7 +149,8 @@ export class LoginPage extends React.Component {
 const mapDispatchToProps = (dispatch) => ({
   login: (uid) => dispatch(login(uid)),
   logout: () => dispatch(logout()),
-  startAddUser: (email, hash, salt) => dispatch(startAddUser(email, hash, salt)),
+  startAddUser: (email, hash) => dispatch(startAddUser(email, hash)),
+  startLogin: (email, hash) => dispatch(startLogin(email, hash)),
   startSetStockData: () => dispatch(startSetStockData()),
   startSetStocks: (uid) => dispatch(startSetStocks(uid))
 });

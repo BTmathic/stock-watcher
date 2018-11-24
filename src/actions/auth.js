@@ -1,13 +1,13 @@
-import { firebase, googleAuthProvider } from '../firebase/firebase';
+import { firebase } from '../firebase/firebase';
 
 export const login = (uid) => ({
   type: 'LOGIN',
   uid
 });
 
-export const startLogin = () => {
+export const startLogin = (email, hash) => {
   return () => {
-    return firebase.auth().signInWithPopup(googleAuthProvider);
+    return firebase.auth().signInWithEmailAndPassword(email, hash);
   };
 };
 
@@ -21,16 +21,15 @@ export const startLogout = () => {
   };
 };
 
-export const startAddUser = (email, hash, salt) => {
+export const startAddUser = (email, hash) => {
   return () => {
     return firebase.auth().createUserWithEmailAndPassword(email, hash).then(() => {
       const uid = firebase.auth().currentUser.uid;
-      const userRef = firebase.database().ref(`users/${uid}`);
-      userRef.set({
-        email: email,
-        hash: hash,
-        salt: salt,
+      const adminRef = firebase.database().ref(`admin/${uid}`);
+      adminRef.set({
+        hash: hash
       });
+      const userRef = firebase.database().ref(`users/${uid}`);
       userRef.child('stocks').push().set({
         name: 'GOOG',
         watching: true

@@ -1,27 +1,62 @@
+const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt');
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const saltRounds = 10;
 
 module.exports = (app, admin) => {
-  passport.use(new LocalStrategy(
-    (email, password, done) => {
+  app.route('/login')
+    .post((req, res) => {
+      const email = req.body.email;
+      let error = '';
       admin.auth().getUserByEmail(email)
         .then((userRecord) => {
-          if (!bcrypt.compareSync(password, userRecord.password)) {
-            return done(null, false, { message: 'Incorrect email or password' });
-          }
-          // successful login
-          return done(null, email);
+          const uid = userRecord.uid;
+          const userRef = admin.database().ref(`admin/${uid}`)
+          userRef.once('value', (snapshot) => {
+            const snap = snapshot.val();
+            bcrypt.compare(req.body.password + process.env.PEPPER, snap.hash, (err, success) => {
+              if (err) {
+                console.log('Error checking password', err);
+              }
+              if (success) {
+                res.send({ email: email, hash: snap.hash });
+              } else {
+                res.send({ error: 'Incorrect credentials provided' })
+              }
+            });
+          });
         })
         .catch((err) => {
-          console.log(err.code); // use this to check incorrect password message? Is this even a thing with tokens?
-          if (err.code === 'auth/user-not-found') {
-            return done(null, false, { message: 'Incorrect email or password' });
-          } else {
-            console.log('Error loggin in:', err);
-            return done(err);
+          console.log('Error', err);
+        });
+  });
+
+  app.route('/register')
+    .post((req, res) => {
+      const email = req.body.email;
+      let error = '';
+      admin.auth().getUserByEmail(email)
+        .then(() => {
+          error = 'Email already in use';
+          res.send({ error: error });
+        })
+        .catch((err) => {
+          if (err.code !== 'auth/user-not-found') {
+            console.log('Error fetching:', err);
+            error = 'Something went wrong on our end...'
+            res.send({ error: error });
+          } else { // email not found, make the account
+            bcrypt.genSalt(saltRounds, (err, salt) => {
+              if (err) {
+                console.log('Error hashing', err);
+              }
+              bcrypt.hash(req.body.password + process.env.PEPPER, salt, (err, hash) => {
+                if (err) {
+                  console.log('Error generating hash', err);
+                }
+                res.send({ email: email, hash: hash });
+              })
+            });
           }
         });
-    }
-  ));
-};
+     })
+}
