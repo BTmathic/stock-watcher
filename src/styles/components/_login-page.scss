@@ -1,32 +1,56 @@
-.login, .register {
-  h3 {
-    text-align: center;
-  }
-  form {
-    margin: 0 auto;
-    width: 30%;
-    .login--input {
-      display: flex;
-      justify-content: space-between;
-      input {
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 0.2rem;
-      }
+.login-page {
+  align-items: center;
+  background: $grey;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 0 auto;
+  min-height: 100vh;
+  .login, .register {
+    background: linear-gradient(to bottom right, lighten($blue, 10%), $blue);
+    border-radius: 5px;
+    margin: 2rem 0;
+    max-width: 400px;
+    min-width: 320px;
+    padding: 3rem;
+    width: 45%;
+    h3 {
+      margin-top: 0;
+      text-align: center;
     }
-    .login--buttons {
+    .error {
+      color: lighten(red, 20%);
+      font-weight: bold;
+      text-align: center;
+    }
+    form {
       margin: 0 auto;
-      padding-top: 0.5rem;
-      width: 80%;
-      .login--button {
-        background: $grey;
-        border: none;
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-        margin: 1rem;
-        padding: 1rem 0;
-        width: 40%; 
+      .auth--input {
+        display: flex;
+        justify-content: space-between;
+        input {
+          border: 1px solid black;
+          border: none;
+          border-radius: 5px;
+          margin: 0.1rem 0;
+          padding: 0.3rem 0.2rem;
+        }
+      }
+      .auth--buttons {
+        margin: 0 auto;
+        padding-top: 0.5rem;
+        width: 80%;
+        .auth--button {
+          background: linear-gradient(to top left, $grey, lighten($grey, 5%));
+          border: none;
+          border-radius: 5px;
+          color: white;
+          cursor: pointer;
+          margin: 1rem;
+          padding: 1rem 0;
+          width: 40%; 
+        }
       }
     }
   }

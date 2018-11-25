@@ -92,21 +92,21 @@ export class LoginPage extends React.Component {
   
   render() {
     return (
-      <div>
+      <div className='login-page'>
         <div className='login'>
           <h3>Login</h3>
           <form onSubmit={this.handleLogin}>
-            <div className='login--input'>
+            <div className='auth--input'>
               <label>Email</label>
               <input type='email' />
             </div>
-            <div className='login--input'>
+            <div className='auth--input'>
               <label>Password</label>
               <input type='password' />
             </div>
-            <div className='login--buttons'>
-              <input type='submit' value='Login' className='login--button' />
-              <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
+            <div className='auth--buttons'>
+              <input type='submit' value='Login' className='auth--button' />
+              <input type='button' value='Cancel' className='auth--button' onClick={() => history.push('/')} />
             </div>
           </form>
           {
@@ -118,21 +118,21 @@ export class LoginPage extends React.Component {
         <div className='register'>
           <h3>New User? Sign up</h3>
           <form onSubmit={this.handleRegister}>
-            <div className='login--input'>
+            <div className='auth--input'>
               <label>Email</label>
               <input type='email' />
             </div>
-            <div className='login--input'>
+            <div className='auth--input'>
               <label>Password</label>
               <input type='password' />
             </div>
-            <div className='login--input'>
+            <div className='auth--input'>
               <label>Confirm Password</label>
               <input type='password' />
             </div>
-            <div className='login--buttons'>
-              <input type='submit' value='Register' className='login--button' />
-              <input type='button' value='Cancel' className='login--button' onClick={() => history.push('/')} />
+            <div className='auth--buttons'>
+              <input type='submit' value='Register' className='auth--button' />
+              <input type='button' value='Cancel' className='auth--button' onClick={() => history.push('/')} />
             </div>
           </form>
           {
