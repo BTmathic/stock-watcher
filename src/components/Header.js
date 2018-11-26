@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { startLogin, startLogout } from '../actions/auth';
+import { history } from '../routers/AppRouter';
+import { startLogout } from '../actions/auth';
 
 export const Header = ({ uid, startLogin, startLogout }) => (
   <header className='header'>
@@ -11,7 +12,7 @@ export const Header = ({ uid, startLogin, startLogout }) => (
           <h1>Stock Watcher</h1>
         </Link>
         {uid ? <button className='button button--header' onClick={startLogout}>Logout</button>
-          : <button className='button' onClick={startLogin}>Get Started</button>
+          : <button className='button' onClick={() => history.push('/login')}>Login</button>
         }
       </div>
     </div>
@@ -23,7 +24,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  startLogin: () => dispatch(startLogin()),
   startLogout: () => dispatch(startLogout())
 });
 

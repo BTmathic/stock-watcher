@@ -7,16 +7,15 @@ export default () => (
     <Header />
     <div className='landing-display'>
       <div className='landing-display__panel'>
-        <div className='landing-display--image'>
-          <div className='landing-display--image-inlay'></div>
+        <h2>Watch your portfolio with ease, follow stocks and get analytics</h2>
+        <p>Quick and easy to setup, 100% free membership</p>
+        <div className='landing-display--buttons'>
+          <div className='landing-display--button' onClick={() => history.push('/login')}>Get Started</div>
         </div>
       </div>
       <div className='landing-display__panel'>
-        <h2>Watch your portfolio with ease</h2>
-        <p>Quick and easy to setup</p>
-        <div className='landing-display--buttons'>
-          <div className='landing-display--button' onClick={() => history.push('/login')}>Get Started</div>
-          <div className='landing-display--button'>Preview</div>
+        <div className='landing-display--image'>
+          <div className='landing-display--image-inlay'></div>
         </div>
       </div>
     </div>
@@ -32,9 +31,6 @@ export default () => (
           </div>
         </div>
         <div className='description'>
-          <div className='description--text'>
-            Use our stock watcher for a simple way to keep track of your portfolio, watch other stocks you are interested in or just keep track of any stock you are curious about.
-            </div>
           <div className='description__logos'>
             <div className='description__logo'>
               <img src='/Images/amazon-logo.jpg' />
@@ -52,7 +48,34 @@ export default () => (
                 <img src='/Images/amazon-logo.jpg' />
               </div>
               <img src='/Images/TD-logo.svg' />
-              <div>TSE: TD</div>
+              <div>TSX: TD</div>
+            </div>
+            <div className='description__logo'>
+              <div className='logo-padding'>
+                <img src='/Images/amazon-logo.jpg' />
+              </div>
+              <img src='/Images/AMEX.png' />
+              <div>NYSE: AXP</div>
+            </div>
+          </div>
+          <div className='description__logos'>
+            <div className='description__logo'>
+              <img src='/Images/Tesla.svg' />
+              <div>NASDAQ: TSLA</div>
+            </div>
+            <div className='description__logo'>
+              <div className='logo-padding'>
+                <img src='/Images/amazon-logo.jpg' />
+              </div>
+              <img src='/Images/Netflix.png' />
+              <div>NASDAQ: NFLX</div>
+            </div>
+            <div className='description__logo'>
+              <div className='logo-padding'>
+                <img src='/Images/amazon-logo.jpg' />
+              </div>
+              <img src='/Images/Facebook.png' />
+              <div>NASDAQ: FB</div>
             </div>
           </div>
         </div>

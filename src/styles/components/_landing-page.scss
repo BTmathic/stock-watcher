@@ -1,6 +1,16 @@
 .landing-display {
   align-items: center;
-  background: #111;
+  background: linear-gradient(-60deg,
+    lighten(#4694D0, 20%) 10%,
+    lighten(#4694D0, 10%) 10%,
+    lighten(#4694D0, 10%) 20%,
+    #4694D0 20%,
+    #4694D0 30%,
+    darken(#4694D0, 10%) 30%,
+    darken(#4694D0, 10%) 40%,
+    #222 40%,
+    #111
+  );
   color: $off-white;
   display: flex;
   height: calc(100vh - 75px);
@@ -31,6 +41,7 @@
       display: flex;
       justify-content: center;
       .landing-display--button {
+        background: #444;
         border: 2px solid $off-white;
         border-radius: 5px;
         cursor: pointer;
