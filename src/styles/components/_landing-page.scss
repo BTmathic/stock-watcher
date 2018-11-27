@@ -2,24 +2,25 @@
   align-items: center;
   background: linear-gradient(-60deg,
     lighten(#4694D0, 20%) 10%,
-    lighten(#4694D0, 10%) 10%,
-    lighten(#4694D0, 10%) 20%,
-    #4694D0 20%,
-    #4694D0 30%,
-    darken(#4694D0, 10%) 30%,
+    lighten(#4694D0, 20%) 25%,
+    #4694D0 25%,
+    #4694D0 40%,
     darken(#4694D0, 10%) 40%,
-    #222 40%,
+    darken(#4694D0, 10%) 50%,
+    #222 50%,
     #111
   );
   color: $off-white;
   display: flex;
   height: calc(100vh - 75px);
   justify-content: center;
-  margin-bottom: 17.5rem;
+  position: relative;
   text-align: center;
   .landing-display__panel {
     margin: 0;
+    position: relative;
     width: 40%;
+    z-index: 1;
     .landing-display--image {
       background: url('/Images/bg.jpg');
       background-size: cover;
@@ -28,7 +29,7 @@
       padding-top: 75%;
       width: 100%;
       .landing-display--image-inlay {
-        background: url('/Images/stock.png');
+        background: url('/Images/landing-stocks.jpg');
         background-size: cover;
         border-radius: 15px;
         height: 0;
@@ -40,14 +41,18 @@
     .landing-display--buttons {
       display: flex;
       justify-content: center;
-      .landing-display--button {
-        background: #444;
-        border: 2px solid $off-white;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 0 0.5rem;
-        padding: 0.5rem 1rem;
-      }
     }
   }
+}
+
+.get-started--button {
+  background: #555;
+  border: 2px solid #555;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
+  max-width: 15rem;
+  padding: 0.5rem 1rem;
+  width: 45%;
 }

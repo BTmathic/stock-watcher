@@ -17,7 +17,6 @@ export class LoginPage extends React.Component {
     e.preventDefault();
     this.setState(() => ({ loginError: '' }));
     // hash password so even if compromised the password will not be exposed
-    console.log('Get to fetch');
     fetch('/login', {
       method: 'POST',
       mode: 'cors',

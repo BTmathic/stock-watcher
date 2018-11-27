@@ -1,5 +1,6 @@
 node_modules/
 public/dist/
+public/Images/credits.txt
 .env.development
 .env.test
 .env

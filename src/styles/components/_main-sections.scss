@@ -1,0 +1,155 @@
+.main-sections {
+  margin-top: 0rem; // only for widest display, needs adjusting for responsive after fixing the width of the description for each media query
+  .main-section-container {
+    position: relative;
+    .get-started {
+      display: flex;
+      flex-direction: column;
+      margin: -4rem auto;
+      padding: 2rem 0;
+      .get-started__map {
+        align-items: center;
+        display: flex;
+        height: 100px;
+        justify-content: space-evenly;
+        .get-started__map-point {
+          border: 1rem solid black;
+          border-radius: 50%;
+          height: 0.5rem;
+          padding: 2rem;
+          width: 0.5rem;
+        }
+      }
+      .get-started__steps {
+        display: flex;
+        justify-content: space-evenly;
+        margin: 0 auto;
+        width: 85%;
+        .get-started__step {
+          align-items: center;
+          border-radius: 25px;
+          display: flex;
+          font-size: 90%;
+          font-weight: bold;
+          justify-content: space-around;
+          margin: 1rem 2rem;
+          padding: 1rem 2rem;
+          min-width: 15rem;
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
+      }
+    }
+    .stock-icons, .get-started {
+      background: $off-white;
+      border-radius: 2rem;
+      left: 10%;
+      position: absolute;
+      text-align: center;
+      top: -15%;
+      width: 80%;
+      .stock-icons__logos {
+        display: flex;
+        justify-content: space-evenly;
+        margin: 0 auto;
+        padding-top: 1rem;
+        width: 80%;
+        .stock-icons__logo {
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          font-size: 80%;
+          font-weight: bold;
+          justify-content: space-between;
+          margin: 0 auto;
+          text-align: center;
+          img {
+            margin: 0.5rem auto;
+            width: 50%;
+          }
+        }
+        .logo-padding {
+          height: 0;
+          opacity: 0;
+        }
+      }
+    }
+    .stock-icons {
+      margin: -6rem auto;
+      position: absolute;
+      top: 0rem;
+      .stock-icons--overlay {
+        background: $off-white;
+        border-radius: 2rem;
+        padding: 1.5rem;
+        position: relative;
+        top: -15%;
+        z-index: 1;
+      }
+      .stock-icons--side-panel {
+        background: linear-gradient(-60deg, lighten(#4694D0, 30%) 30%, rgba(0,0,0,0) 30%);
+        height: 200%;
+        position: absolute;
+        top: -50%;
+        width: 100vw;
+      }
+    }
+    .main-section {
+      align-items: center;
+      align-content: center;
+      background: linear-gradient($dark-grey, #555);
+      color: $off-white;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 15rem 10rem;
+      position: relative;
+      .main-section--image-container {
+        border-radius: 20px;
+        padding: 1rem 0;
+        width: 50%;
+        .main-section--image1 {
+          background: url('/Images/compare.png');
+          background-size: cover;
+          border-radius: 15px;
+          height: 0;
+          margin: 0 auto;
+          padding-top: 67%;
+          width: 90%;
+        }
+        .main-section--image2 {
+          background: url('/Images/numbers-board.jpg');
+          background-size: cover;
+          border-radius: 15px;
+          height: 0;
+          margin: 0 auto;
+          padding-top: 80%;
+          width: 80%;
+        }
+      }
+      .main-section--text {
+        padding: 2rem;
+        text-align: center;
+        width: 30%;
+      }
+    }
+    .main-section2 {
+      background: linear-gradient(lighten(lightblue, 20%), lighten(lightblue, 10%));
+      color: black;
+      .get-started--button {
+        color: $off-white;
+      }
+    }
+    .main-section3 {
+      background: linear-gradient(-60deg, #111, #222 70%,
+        darken(#4694D0, 10%) 70%,
+        darken(#4694D0, 10%) 80%,
+        #4694D0 80%,
+        #4694D0 90%,
+        lighten(#4694D0, 20%) 90%,
+        lighten(#4694D0, 20%) 95%
+      );
+    }
+  }
+}
