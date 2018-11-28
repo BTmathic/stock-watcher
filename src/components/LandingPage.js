@@ -51,6 +51,10 @@ export default () => (
         <GetStarted />
       </div>
     </div>
-    <footer>Footer</footer>
+    <footer>
+      <div>Created by: <a href='https://btmathic.github.io/'>Alexander Molnar</a></div>
+      <div>&copy; 2018</div>
+      <div>Stock Data: <a href='https://www.alphavantage.co/'>Alphavantage</a></div>
+    </footer>
   </div>
 );

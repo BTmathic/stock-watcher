@@ -109,7 +109,7 @@ class DashboardPage extends React.Component {
     if (portfolio.filter((stock) => stock.name === this.state.newStock.toUpperCase()).length === 0) {
       const stockData = this.props.stockData.filter((stock) => stock.name === this.state.newStock.toUpperCase());
       if (stockData.length === 0) {
-        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.state.newStock}&apikey=${process.env.API_KEY}`)
+        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${this.state.newStock}&apikey=${process.env.STOCK_API_KEY}`)
           .then((resp) => resp.json())
           .then((json) => {
             const metaData = json['Meta Data'];

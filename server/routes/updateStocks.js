@@ -8,7 +8,7 @@ module.exports = (app, db) => {
     return new Promise((res, rej) => {
       setTimeout(() => {
         console.log(`${stock.name} is being updated`);
-        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stock.name}&apikey=${process.env.API_KEY}`)
+        fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stock.name}&apikey=${process.env.STOCK_API_KEY}`)
           .then((resp) => resp.json())
           .then((json) => {
             const metaData = json['Meta Data'];
