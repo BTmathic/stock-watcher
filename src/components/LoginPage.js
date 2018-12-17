@@ -33,7 +33,7 @@ export class LoginPage extends React.Component {
       } else {
         this.props.startLogin(json.email, json.hash);
       }
-    }).catch((err) => console.log(err));
+    }).catch((err) => console.log('Error logging in in LoginPage', err));
   };
 
   handleRegister = (e) => {
@@ -63,7 +63,7 @@ export class LoginPage extends React.Component {
         } else {
           this.props.startAddUser(json.email, json.hash);
         }
-      }).catch((err) => console.log(err));
+      }).catch((err) => console.log('Error registering in in LoginPage', err));
     }
   }
 

@@ -13,19 +13,19 @@ const app = express();
 const admin = require('firebase-admin');
 const serviceAccount = {
   type: process.env.FIREBASE_SDK_TYPE,
-  project_id: process.env.FIREBASE_SDK_PROJECT_ID,
+  project_id: process.env.FIREBASE_PROJECT_ID,
   private_key_id: process.env.FIREBASE_SDK_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_SDK_PRIVATE_KEY,
-  "client_email": process.env.FIREBASE_SDK_CLIENT_EMAIL,
-  "client_id": process.env.FIREBASE_SDK_CLIENT_ID,
-  "auth_uri": process.env.FIREBASE_SDK_AUTH_URI,
-  "token_uri": process.env.FIREBASE_SDK_TOKEN_URI,
-  "auth_provider_x509_cert_url": process.env.FIREBASE_SDK_AUTH_PROVIDER,
-  "client_x509_cert_url": process.env.FIREBASE_SDK_CLIENT_CERT
+  private_key: process.env.FIREBASE_SDK_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  client_email: process.env.FIREBASE_SDK_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_SDK_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_SDK_AUTH_URI,
+  token_uri: process.env.FIREBASE_SDK_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_SDK_AUTH_PROVIDER,
+  client_x509_cert_url: process.env.FIREBASE_SDK_CLIENT_CERT
 }
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://stock-watcher-28e02.firebaseio.com/',
+  databaseURL:process.env.FIREBASE_DATABASE_URL,
   databaseAuthVariableOverride: {
     uid: 'my-service-worker'
   }
