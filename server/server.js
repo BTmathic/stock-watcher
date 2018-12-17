@@ -32,7 +32,7 @@ const serviceAccount = {
 }
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DB_URL,
+  databaseURL:process.env.FIREBASE_DB_URL,
   databaseAuthVariableOverride: {
     uid: 'my-service-worker'
   }
