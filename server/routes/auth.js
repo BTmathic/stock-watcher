@@ -44,7 +44,7 @@ module.exports = (app, admin) => {
             console.log('Error fetching:', err);
             error = 'Something went wrong on our end...'
             res.send({ error: error });
-          } else { // email not found, make the account
+          } else { // new email, make the account
             bcrypt.genSalt(saltRounds, (err, salt) => {
               if (err) {
                 console.log('Error hashing', err);
