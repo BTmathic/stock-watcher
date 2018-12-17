@@ -11,7 +11,7 @@ const update = require('./routes/updateStocks.js');
 const app = express();
 
 const admin = require('firebase-admin');
-console.log(process.env.FIREBASE_SDK_TYPE);
+console.log(process.env.FIREBASE_SDK_PROJECT_ID);
 const serviceAccount = {
   type: process.env.FIREBASE_SDK_TYPE,
   project_id: process.env.FIREBASE_SDK_PROJECT_ID,
