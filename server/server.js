@@ -11,7 +11,6 @@ const update = require('./routes/updateStocks.js');
 const app = express();
 
 const admin = require('firebase-admin');
-console.log(process.env.FIREBASE_SDK_TYPE);
 const serviceAccount = {
   type: process.env.FIREBASE_SDK_TYPE,
   project_id: process.env.FIREBASE_SDK_PROJECT_ID,
@@ -26,7 +25,7 @@ const serviceAccount = {
 }
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://stock-watcher-28e02.firebaseio.com/',
+  databaseURL: process.env.FIREBASE_DB_URL,
   databaseAuthVariableOverride: {
     uid: 'my-service-worker'
   }
