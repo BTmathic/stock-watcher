@@ -9,14 +9,6 @@ const config = {
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID
 };
 
-console.log('******************Testing******************');
-console.log('******************Testing******************');
-console.log('******************Testing******************');
-console.log(config.apiKey);
-console.log('******************Testing******************');
-console.log('******************Testing******************');
-console.log('******************Testing******************');
-
 firebase.initializeApp(config);
 const database = firebase.database();
 
