@@ -54,7 +54,7 @@
     "react": "16.0.0",
     "react-addons-shallow-compare": "^15.6.2",
     "react-dates": "12.7.0",
-    "react-dom": "16.0.0",
+    "react-dom": "16.0.1",
     "react-faux-dom": "^4.2.0",
     "react-modal": "^3.6.1",
     "react-redux": "^5.0.7",
