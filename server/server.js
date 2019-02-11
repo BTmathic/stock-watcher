@@ -2,12 +2,15 @@ require('dotenv').config();
 const path = require('path');
 const port = process.env.PORT || 3000;
 const publicPath = path.join(__dirname, '..', 'public');
+const cors = require('cors');
 
 const bodyParser = require('body-parser');
+const Bundler = require('parcel-bundler');
 const express = require('express');
 
-const auth = require('./routes/auth.js');
-const update = require('./routes/updateStocks.js');
+const auth = require('../server/routes/auth.js');
+const update = require('../server/routes/updateStocks.js');
+const bundler = new Bundler(path.join(publicPath, 'index.html'))
 const app = express();
 
 const admin = require('firebase-admin');
@@ -33,16 +36,14 @@ admin.initializeApp({
 
 const db = admin.database();
 
-app.use(express.static(publicPath));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(publicPath, 'index.html'));
-});
-
 auth(app, admin);
 update(app, db);
+
+app.use(bundler.middleware());
 
 app.listen(port, () => {
     console.log('Server is up!');

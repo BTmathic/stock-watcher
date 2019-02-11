@@ -52,7 +52,7 @@ yarn start
 * [Node](https://nodejs.org/en/)
 * [Express](https://expressjs.com/)
 * [Yarn](https://yarnpkg.com/en/)
-* [Webpack](https://webpack.js.org/)
+* [Parcel](https://parceljs.org/)
 * [D3](https://d3js.org/) - Visualizing the stock data
 * [Firebase](https://firebase.google.com/) - storing user accounts and stock data
 * [Bcrypt](https://www.npmjs.com/package/bcrypt) - for securing authentication
